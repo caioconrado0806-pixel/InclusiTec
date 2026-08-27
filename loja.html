@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InclusiTech - Loja de Produtos Assistivos</title>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-card: #161f30;
+      --text-main: #ffffff;
+      --text-muted: #b3c0d8;
+      --accent-yellow: #ffcc00;
+      --accent-blue: #0077ff;
+      --itau-orange: #ec7000;
+      --itau-blue: #003399;
+      --border-color: #2a3b5c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 20px;
+      border-bottom: 3px solid var(--accent-yellow);
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--accent-yellow);
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+    }
+
+    .accessibility-bar {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .btn-acc {
+      background: #22314a;
+      color: var(--text-main);
+      border: 2px solid var(--accent-yellow);
+      padding: 8px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .btn-acc:focus, button:focus, select:focus {
+      outline: 4px solid var(--accent-yellow);
+      outline-offset: 2px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--accent-yellow);
+      transform: translateY(-4px);
+    }
+
+    .card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      color: var(--accent-yellow);
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+    }
+
+    .options-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--text-main);
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      background: #0d1526;
+      color: #fff;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .price {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #4da6ff;
+      margin: 15px 0;
+    }
+
+    .btn-buy {
+      background-color: var(--itau-orange);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+
+    .btn-buy:hover {
+      background-color: #d66300;
+    }
+
+    /* Modal Pix Itaú */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      color: #333333;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      border-top: 8px solid var(--itau-orange);
+      position: relative;
+    }
+
+    .itau-header {
+      background-color: var(--itau-blue);
+      color: white;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    .qr-placeholder {
+      width: 180px;
+      height: 180px;
+      background: #eee;
+      border: 3px dashed #666;
+      margin: 15px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .btn-close {
+      background: #cc0000;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <header role="banner">
+    <h1>InclusiTech - Tecnologia Adaptada</h1>
+    <p class="subtitle">Tecnologia Assistiva e Produtos Inclusivos de Alta Performance</p>
+    
+    <div class="accessibility-bar" aria-label="Controles de Acessibilidade">
+      <button class="btn-acc" onclick="changeFontSize(1)">A+ Aumentar Fonte</button>
+      <button class="btn-acc" onclick="changeFontSize(-1)">A- Diminuir Fonte</button>
+    </div>
+  </header>
+
+  <main class="grid-container" role="main">
+
+    <!-- Produto 1: Bengala Eletrônica -->
+    <article class="card" aria-labelledby="prod1-title">
+      <div>
+        <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80" alt="Pessoa utilizando tecnologia assistiva de navegação para deficiência visual" class="card-img">
+        <h2 id="prod1-title">Bengala Eletrônica com Sensor Ultrassônico</h2>
+        <p>Detecta obstáculos aéreos e terrestres através de vibração e alertas sonoros. Autonomia de 24 horas.</p>
+        
+        <div class="options-group">
+          <label for="color-select">Escolha a cor principal:</label>
+          <select id="color-select" aria-label="Selecione a cor da bengala eletrônica">
+            <option value="Branca">Branca Clássica: segueira total</option>
+            <option value="verde">Verde: baixa visão</option>
+            <option value="Branca e vermelha">Branca e vermelha: surdo cegueira</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="price" aria-label="Preço: 50 reais">R$ 50,00</div>
+        <button class="btn-buy" onclick="openPixModal('Bengala Eletrônica', '50,00')" aria-label="Comprar Bengala Eletrônica via Pix Itaú">
+          <span>Pagar com Pix Itaú</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- Produto 2: Jogos Braille e Ampliados -->
+    <article class="card" aria-labelledby="prod2-title">
+      <div>
+        <img src="https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=600&q=80" alt="Peças de jogo pedagógico adaptado com texturas e relevo" class="card-img">
+        <h2 id="prod2-title">Kit Jogos Braille e Ampliados</h2>
+        <p>Desenvolvidos para baixa visão e cegueira. Inclui cartas adaptadas, dominó tátil e jogos pedagógicos com alto contraste visual e relevo.</p>
+      </div>
+      <div>
+        <div class="price" aria-label="Preço: 65 reais">R$ 65,00</div>
+        <button class="btn-buy" onclick="openPixModal('Kit Jogos Braille e Ampliados', '65,00')" aria-label="Comprar Kit Jogos Braille e Ampliados via Pix Itaú">
+          <span>Pagar com Pix Itaú</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- Produto 3: Livros em Braille -->
+    <article class="card" aria-labelledby="prod3-title">
+      <div>
+        <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80" alt="Livro impresso aberto com marcações de leitura tátil" class="card-img">
+        <h2 id="prod3-title">Coleção Especial de Livros em Braille</h2>
+        <p>Coleção encadernada em relevo Braille padronizado, impressa em papel de alta gramatura. Inclui transcrição para leitores videntes na mesma página.</p>
+      </div>
+      <div>
+        <div class="price" aria-label="Preço: 30 reais">R$ 30,00</div>
+        <button class="btn-buy" onclick="openPixModal('Coleção de Livros em Braille', '30,00')" aria-label="Comprar Coleção de Livros em Braille via Pix Itaú">
+          <span>Pagar com Pix Itaú</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- Produto 4: Jogos de Tabuleiro em Braille -->
+    <article class="card" aria-labelledby="prod4-title">
+      <div>
+        <img src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=600&q=80" alt="Tabuleiro de xadrez adaptado em madeira com peças fixáveis" class="card-img">
+        <h2 id="prod4-title">Jogo de Tabuleiro Adaptado (Xadrez e Dama)</h2>
+        <p>Tabuleiro de madeira nobre com casas rebaixadas e elevadas. Peças com pino de fixação e marcações táteis distintivas para brancas e pretas.</p>
+      </div>
+      <div>
+        <div class="price" aria-label="Preço: 65 reais">R$ 65,00</div>
+        <button class="btn-buy" onclick="openPixModal('Jogo de Tabuleiro em Braille', '65,00')" aria-label="Comprar Jogo de Tabuleiro em Braille via Pix Itaú">
+          <span>Pagar com Pix Itaú</span>
+        </button>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- Modal do Pix Itaú -->
+  <div class="modal-overlay" id="pixModal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <div class="itau-header">Itaú - Pagamento via Pix</div>
+      <h3 id="modal-title" style="margin-bottom: 10px;">Finalizar Compra</h3>
+      <p id="modal-item-name" style="font-weight: bold; font-size: 1.1rem; color: #111;"></p>
+      <p id="modal-item-price" style="font-size: 1.4rem; color: var(--itau-orange); font-weight: bold; margin: 10px 0;"></p>
+      
+      <div class="qr-placeholder" aria-label="Código QR estático do Pix Itaú">
+        [ QR CODE ITAÚ PIX ]
+      </div>
+
+      <p style="font-size: 0.9rem; color: #555;">Abra o app do seu banco e escaneie o código acima ou copie a chave Pix.</p>
+      
+      <button class="btn-close" onclick="closePixModal()">Fechar / Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+    // Controle de Tamanho de Fonte
+    let currentFontSize = 100;
+    function changeFontSize(delta) {
+      currentFontSize += delta * 10;
+      if (currentFontSize < 80) currentFontSize = 80;
+      if (currentFontSize > 150) currentFontSize = 150;
+      document.body.style.fontSize = currentFontSize + '%';
+    }
+
+    // Abertura e Fechamento do Modal Pix Itaú
+    function openPixModal(itemName, itemPrice) {
+      let selectedColor = "";
+      if (itemName === 'Bengala Eletrônica') {
+        const colorVal = document.getElementById('color-select').value;
+        selectedColor = ` (Cor: ${colorVal})`;
+      }
+
+      document.getElementById('modal-item-name').innerText = itemName + selectedColor;
+      document.getElementById('modal-item-price').innerText = "Valor: R$ " + itemPrice;
+      
+      const modal = document.getElementById('pixModal');
+      modal.style.display = 'flex';
+      modal.focus();
+    }
+
+    function closePixModal() {
+      document.getElementById('pixModal').style.display = 'none';
+    }
+
+    // Fechar modal pressionando tecla ESC
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closePixModal();
+      }
+    });
+  </script>
+</body>
+</html>

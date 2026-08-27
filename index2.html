@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A visão além do futuro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 60%, #020617 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #f1f5f9;
+        }
+
+        .conteudo-pagina {
+            max-width: 760px;
+            width: 100%;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.9), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(147, 197, 253, 0.3);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            box-shadow: 
+                0 0 40px rgba(59, 130, 246, 0.25),
+                0 20px 40px rgba(0, 0, 0, 0.6);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .titulo {
+            text-align: center;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.4);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .titulo h1 {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-voltar:hover {
+            background: linear-gradient(135deg, #4338ca, #2563eb);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.5);
+        }
+
+        .btn-voltar:active {
+            transform: translateY(0);
+        }
+
+        .texto {
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+        }
+
+        .texto p {
+            margin-bottom: 16px;
+        }
+
+        .texto ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+            list-style-type: none;
+        }
+
+        .texto li {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 12px;
+        }
+
+        .texto li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #60a5fa;
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .texto strong {
+            color: #93c5fd;
+            font-weight: 600;
+        }
+
+        .area-descricao {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .btn-descricao {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            border: 2px solid #60a5fa;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+            transition: all 0.25s ease;
+        }
+
+        .btn-descricao:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(60, 130, 246, 0.6);
+        }
+
+        .btn-descricao:active {
+            transform: translateY(0);
+        }
+
+        /* Estilo do botão quando a áudio-descrição estiver ATIVA */
+        .btn-descricao.ativo {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            border-color: #fca5a5;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.6);
+            animation: pulso 1.8s infinite;
+        }
+
+        .btn-descricao.ativo:hover {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        @keyframes pulso {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+
+        /* Foco acessível via teclado */
+        a:focus-visible, button:focus-visible {
+            outline: 3px solid #fde047;
+            outline-offset: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="conteudo-pagina">
+        <div class="titulo">
+            <h1>O que é deficiência visual?</h1>
+            <a href="index1.html" class="btn-voltar">← Voltar</a>
+        </div>
+        <div class="texto informativo">
+            <p>Deficiência visual é todo tipo de limitação que envolve a visão e que não pode ser corrigida por óculos comuns.</p>
+            <p>Portanto, precisar apenas de óculos de grau não caracteriza uma pessoa como deficiente visual.</p>
+            <p>As principais enquadrações da deficiência visual são:</p>
+            <ul>
+                <li><strong>Deficiência visual total:</strong> A pessoa não enxerga nada (cegueira).</li>
+                <li><strong>Daltonismo:</strong> A pessoa possui alteração na percepção das cores (por exemplo, confundir verde com azul ou vermelho).</li>
+                <li><strong>Baixa visão:</strong> A pessoa enxerga apenas resquícios de luminosidade, vultos ou contornos, mantendo no máximo até 30% da visão normal.</li>
+            </ul>
+        </div>
+
+        <div class="area-descricao">
+            <button id="btnDescricao" class="btn-descricao" onclick="alternarDescricaoVisual()">
+                🔊 Ver descrição
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function alternarDescricaoVisual() {
+            const btn = document.getElementById('btnDescricao');
+            const synth = window.speechSynthesis;
+
+            // Se já estiver falando, cancela a fala e desativa o botão
+            if (synth.speaking) {
+                synth.cancel();
+                resetarBotao();
+                return;
+            }
+
+            // Descrição estritamente visual dos elementos da página
+            const descricaoVisual = "Descrição visual da página: O fundo geral da tela é escuro com um efeito de iluminação em degradê central nas cores azul e cinza. No centro da tela, há um cartão retangular azul com bordas arredondadas e um brilho azul claro ao redor. No topo do cartão, está o título principal 'O que é deficiência visual?' em letras brancas e itálico, seguido por um botão azul 'Voltar'. No corpo do cartão, o texto explicativo é exibido em branco com termos em destaque na cor azul claro. No rodapé do cartão, encontra-se o botão 'Ver descrição'.";
+
+            const voz = new SpeechSynthesisUtterance(descricaoVisual);
+            voz.lang = 'pt-BR';
+            voz.rate = 0.9;
+            voz.pitch = 0.9;
+
+            // Quando terminar a reprodução naturalmente
+            voz.onend = function () {
+                resetarBotao();
+            };
+
+            // Em caso de erro na reprodução
+            voz.onerror = function () {
+                resetarBotao();
+            };
+
+            // Inicia a fala e atualiza o estado visual do botão
+            synth.speak(voz);
+            btn.classList.add('ativo');
+            btn.innerHTML = '⏹️ Parar descrição';
+        }
+
+        function resetarBotao() {
+            const btn = document.getElementById('btnDescricao');
+            btn.classList.remove('ativo');
+            btn.innerHTML = '🔊 Ver descrição';
+        }
+    </script>
+</body>
+</html>
