@@ -6,44 +6,41 @@
     <title>A visão do futuro</title>
     <style>
         * {
-            font-family: Arial, sans-serif;
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: Arial, sans-serif;
         }
+
         body {
-            color: #001f3f; /* Azul-escuro */
+            color: #001f3f;
             text-align: center;
             padding: 20px;
-  background-image:url("cego.jpg");
-background-attachment:fixed;       
-font-family:arial;
-font-size:18pt;
-font-style:italic;
-text-decoration:none;
-border: 1px solid aqua;
-border-radius: 20px;
-}
+            background-image: url("cego.jpg");
+            background-attachment: fixed;
+            font-size: 14pt;
+        }
 
         .conteudo_pagina {
             max-width: 1000px;
             margin: 0 auto;
-            background-image:url("bengala.png");
-            border: 3px solid #003399; /* Azul-bic */
+            background-color: rgba(255, 255, 255, 0.95);
+            background-image: url("bengala.png");
+            border: 3px solid #003399;
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0px 4px 15px rgba(0, 51, 153, 0.2);
         }
 
-        /* Estilização da Logo com Hover */
+        /* Logo com Efeito Hover */
         .logo_pagina {
             width: 150px;
             height: 150px;
             margin: 0 auto 15px auto;
-            border: 3px solid #00e5ff; /* Borda Azul-piscina */
+            border: 3px solid #00e5ff;
             border-radius: 50%;
-            background-color: #d3d3d3; /* Fundo cinza */
-            background-image: url("https://upload.wikimedia.org/wikipedia/commons/2/28/Accessibility_symbol.svg"); /* Símbolo PCD */
+            background-color: #d3d3d3;
+            background-image: url("https://upload.wikimedia.org/wikipedia/commons/2/28/Accessibility_symbol.svg");
             background-size: 70%;
             background-position: center;
             background-repeat: no-repeat;
@@ -52,19 +49,17 @@ border-radius: 20px;
         }
 
         .logo_pagina:hover {
-            width: 100px; /* Largura ajustada para 100px ao passar o mouse */
-            height: 100px; /* Altura ajustada para 100px ao passar o mouse */
-            border-radius: 0%; /* Imagem quadrada */
+            width: 100px;
+            height: 100px;
+            border-radius: 0%;
             background-color: #e0ffff;
-            /* Imagem do pódio: 1º lugar Brasil com troféu e bandeira, 2º Argentina, 3º Espanha, todos com medalhas, sobre gramado 4D */
-            background-image: url("podium_paralimpiadas.webp"); 
+            background-image: url("podium_paralimpiadas.webp");
             background-size: cover;
             background-position: center;
-            border-color: #00e5ff; /* Borda Azul-piscina mantida no hover */
         }
 
         .barra_de_ferramentas {
-            background-color: #003399; /* Azul-bic */
+            background-color: #003399;
             color: #ffffff;
             padding: 15px;
             border-radius: 8px;
@@ -72,15 +67,15 @@ border-radius: 20px;
         }
 
         .cabecalho {
-            background-color: #e0ffff; /* Azul-piscina claro */
-            border: 2px solid #00e5ff; /* Azul-piscina */
+            background-color: #e0ffff;
+            border: 2px solid #00e5ff;
             padding: 25px;
             border-radius: 8px;
             margin-bottom: 20px;
         }
 
         .introducao h2 {
-            color: #001f3f; /* Azul-escuro */
+            color: #001f3f;
             margin-bottom: 10px;
         }
 
@@ -89,14 +84,14 @@ border-radius: 20px;
             font-size: 16pt;
         }
 
-        /* Estilo Geral de Botões */
+        /* Botões */
         button, .btn-action {
-            background-color: #87cefa; /* Azul claro */
+            background-color: #87cefa;
             color: #000000;
-            border: 2px solid #00008b; /* Borda azul escura */
+            border: 2px solid #00008b;
             padding: 10px 20px;
             font-size: 14pt;
-            border-radius: 12px; /* Borda arredondada */
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             margin: 8px 0;
@@ -108,11 +103,10 @@ border-radius: 20px;
             text-decoration: none;
         }
 
-        /* Hover dos Botões: Arco-íris com expansão/contração */
         button:hover, .btn-action:hover {
             background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
             color: #ffffff;
-            transform: scale(1.1); /* Expande e contrai ao passar o mouse */
+            transform: scale(1.05);
         }
 
         ul {
@@ -132,8 +126,8 @@ border-radius: 20px;
             flex-wrap: wrap;
             justify-content: space-around;
             gap: 15px;
-            background-color: #e6e6fa; /* Lilás */
-            border: 2px solid #ee82ee; /* Violeta */
+            background-color: #e6e6fa;
+            border: 2px solid #ee82ee;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -143,33 +137,34 @@ border-radius: 20px;
             flex: 1;
             min-width: 250px;
             background-color: #ffffff;
-            border: 2px solid #8a2be2; /* Roxo */
+            border: 2px solid #8a2be2;
             border-radius: 8px;
             padding: 15px;
         }
 
-.sobre{
-    display: flex;
-    flex-direction: row;
+        .sobre {
+            display: flex;
+            flex-direction: row;
             justify-content: space-around;
             gap: 15px;
-            background-color: #e6e6fa; /* Lilás */
-           border: 2px solid #ee82ee; /* Violeta */
+            background-color: #e6e6fa;
+            border: 2px solid #ee82ee;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-}
-.elementos_2{
+        }
+
+        .elementos_2 {
             background-color: #ffffff;
-            border: 2px solid #8a2be2; /* Roxo */
+            border: 2px solid #8a2be2;
             border-radius: 8px;
             padding: 15px;
             width: 300px;
-}
+        }
 
         .elementos h1 {
             font-size: 18pt;
-            color: #003399; /* Azul-bic */
+            color: #003399;
             margin-bottom: 10px;
         }
 
@@ -186,10 +181,10 @@ border-radius: 20px;
             border: 2px solid #00e5ff;
         }
 
-        /* Enquete */
+        /* Enquetes */
         .poll-section {
-            background-color: #e0f7fa; /* Azul-bebê */
-            border: 2px solid #003399; /* Azul-bic */
+            background-color: #e0f7fa;
+            border: 2px solid #003399;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -203,7 +198,7 @@ border-radius: 20px;
         }
 
         .poll input[type="text"] {
-            width: 80;
+            width: 80%;
             padding: 10px;
             font-size: 14pt;
             border: 2px solid #003399;
@@ -220,117 +215,133 @@ border-radius: 20px;
         .tipos_de_bengala {
             color: darkblue;
             border: 1px solid slateblue;
+            padding: 15px;
+            border-radius: 8px;
         }
-   .contato{
-    display:flex;
-    flex-direction:row;
-align-items:center;
-justify-content:space-around;  
-border:1px solid darkblue;
-width:7000px;
-}
-.redes{
-border: 2px solid lightblue;
-width:600px;
-}
-.form{
-width: 600px;
-border: 2px solid lightblue;
-} 
-.btn_redes{
-    color: aquamarine;
-    padding:8px;
-    background-color: purple;
-}
-.whats{
-    height:500px;
-    width:200px;
-    border: 1px solid blue;
-    margin-top:25px;
-margin-left: 15px;
-}
-.email{
-    height:500px;
-    width:200px;
-    border: 1px solid blue;
-    margin-top:25px;
-margin-left: 15px;
-}
-.outros{
-    height:500px;
-    width:200px;
-    border: 1px solid blue;
-margin-left: 15px;
-    margin-top:25px;
-}
-</style>
+
+        /* Contato */
+        .contato {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            border: 1px solid darkblue;
+            min-height: 500px;
+            margin-bottom: 20px;
+            padding: 20px;
+            gap: 20px;
+            border-radius: 8px;
+        }
+
+        .redes, .form {
+            flex: 1;
+            height: 100%;
+            min-height: 400px;
+            border: 2px solid lightblue;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .redes {
+            background-color: #00e5ff;
+        }
+
+        .form {
+            background-color: #00008b;
+        }
+
+        .whats, .email, .outros {
+            height: 80px;
+            width: 80%;
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+        }
+
+        .whats { background-color: #0055ff; }
+        .email { background-color: rgb(83, 83, 182); }
+        .outros { background-color: rgb(149, 149, 221); }
+
+        .btn_redes {
+            color: #ffffff;
+            padding: 8px 16px;
+            background-color: purple;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 <body>
-Deficiencia visual
     <div class="conteudo_pagina">
-        <div class="logo_pagina">
-            <img class="logo-pagina" src="cego-sim.jpg" alt="Logo do site mostrando símbolo de acessibilidade que muda no hover para pódio paralímpico com atleta brasileiro em 1º com troféu e bandeira do Brasil, Argentina em 2º e Espanha em 3º, todos com medalhas em campo 4D">
-        </div>
+        <div class="logo_pagina" role="img" aria-label="Símbolo de acessibilidade"></div>
+        
         <div class="barra_de_ferramentas">
-            <h1>Deficiência Visual</h1>
+            <h1>A visão do futuro</h1>
         </div>
+
         <div class="cabecalho">
-            <br>
             <div class="introducao">
                 <h2>Você confia no que está vendo?</h2>
                 <p>Como um cego enxerga?</p>
                 <p>Como ele se sente?</p>
+                <p>Como ele sabe que chegamos em um ambiente sem termos aberto a boca?</p>
                 <p>Irei responder a todas essas perguntas em meu livro <em>A visão de um cego</em>. Acesse-o abaixo:</p>
                 <button class="btn_introducao">
                     <a href="capa.html">Conheça minha história</a>
                 </button>
             </div>
             <br>
-            <br>
             <div class="tipos_de_bengala">
                 <h2>Tipos de bengala</h2>
-                <ul>        
-                    <li class="l1">Bengala longa branca: utilizada por deficientes visuais totais</li>
-                    <button class="m1"><a href="bengala.png">Saiba mais</a></button>
-
-                    <li class="l2">Bengala longa verde: utilizada por deficientes visuais com baixa visão</li>
-                    <button class="m2"><a href="bengala_verde.png">Saiba mais</a></button>
-
-                    <li class="l3">Bengala longa branca e vermelha: utilizada por deficientes visuais com deficiência auditiva</li>
-                    <button class="m3"><a href= "bengala_vermelha.png">Saiba mais</a></button>
+                <ul>
+                    <li>
+                        Bengala longa branca: utilizada por pessoas com deficiência visual total.
+                        <button><a href="bengala.png">Saiba mais</a></button>
+                    </li>
+                    <li>
+                        Bengala longa verde: utilizada por pessoas com baixa visão.
+                        <button><a href="bengala_verde.png">Saiba mais</a></button>
+                    </li>
+                    <li>
+                        Bengala longa branca e vermelha: utilizada por pessoas com surdocegueira.
+                        <button><a href="bengala_vermelha.png">Saiba mais</a></button>
+                    </li>
                 </ul>
-                <p class="t1">Existem mais cores de bengalas, essas são as mais comuns.</p>
+                <p>Existem mais cores de bengalas, essas são as mais comuns.</p>
             </div>
         </div>
-        <br>
+
         <div class="cards">
             <div class="elementos">
                 <h1>Bengala longa</h1>
-                <p>As bengalas longas são ferramentas de acessibilidade que pessoas com deficiência visual utilizam para se locomover.</p>
-                <img class="img_cards" src="bengala.webp" alt="bengala longa branca para deficiente visual total">
+                <p>Ferramenta de acessibilidade utilizada para navegação e orientação espacial.</p>
+                <img class="img_cards" src="bengala.webp" alt="Bengala longa branca">
                 <br>
-                <button class="btn_bengala"><a href="https://www.laramara.org.br" target="_blank">Saiba mais</a></button>
+                <button><a href="https://www.laramara.org.br" target="_blank" rel="noopener">Saiba mais</a></button>
             </div> 
             <div class="elementos">
                 <h1>Leitores de tela</h1>
-                <p>O leitor de tela é uma ferramenta de acessibilidade de informática utilizada na utilização de computadores e celulares.</p>
-                <img class="img_tela" src="computador.png" alt="deficiente visual utilizando notebook">
+                <p>Softwares que convertem texto em áudio para navegação em dispositivos digitais.</p>
+                <img class="img_tela" src="computador.png" alt="Pessoa utilizando leitor de tela no computador">
                 <br>
-                <button class="btn_tela"><a href="https://olhardigital.com.br" target="_blank">Saiba mais</a></button>   
+                <button><a href="https://olhardigital.com.br" target="_blank" rel="noopener">Saiba mais</a></button>   
             </div>
-            
             <div class="elementos">
                 <h1>Materiais em Braille</h1>
-                <p>O braille é uma forma de escrita tátil utilizada por deficientes visuais para a leitura e escrita.</p>
-                <img class="img_braille" src="fundo.webp" alt="professora ensinando braille para alunos deficientes visuais">
+                <p>Sistema de escrita tátil utilzado por pessoas cegas para leitura e escrita.</p>
+                <img class="img_braille" src="fundo.webp" alt="Material em escrita Braille">
                 <br>
-                <button class="btn_braille"><a href="https://fundacaodorina.org.br" target="_blank">Saiba mais</a></button>
+                <button><a href="https://fundacaodorina.org.br" target="_blank" rel="noopener">Saiba mais</a></button>
             </div>
         </div>
-        <br>
-        <br>
+
         <div class="poll-section">
-            <div class="poll-title">O que você imagina que é ser uma pessoa deficiente visual?</div>
+            <div class="poll-title">O que você imagina que é ser uma pessoa com deficiência visual?</div>
             <div class="poll">
                 <input type="text" id="txtopniao" placeholder="Digite sua opinião aqui...">    
             </div>
@@ -339,49 +350,57 @@ Deficiencia visual
                 <button class="btn-action" id="btn-zerar">Zerar Enquete</button>
             </div>
             <div class="poll-results">
-                Total de votos da rodada: <span id="votos-rodada">0</span> | Total geral de votos: <span id="votos-total">0</span>
+                Total de votos da rodada: <span id="votos-rodada">0</span> | Total geral: <span id="votos-total">0</span>
             </div>
         </div>
-<br>
-<div class="sobre">
-    <div class="elementos_2">
-    <img class="img_tela" src="video_game.jpg">
-    </div>
-    <div class="elementos_2">
-    <h1>A visão do futuro: meu projeto</h1>
-    <p class="t1">Meu projeto consiste em adaptar um video-game do zero, xbox-360.</p>
-    <p class="t2">Este projeto ligado a um site, uma página web para o instituto Olhos da Alma servirão como meu tcc.</p>
-    <p class="t3">Caso não consiga produzir esta ideia, tenho um segundo plano, quer saber qual é minha segunda ideia, acesse o botão abaixo.</p>
-    <button class="btn-descricao"><a href="index2.html">Você sabia?     </a></button>
-    </div>  
-</div>
 
-
-<div class="contato">  
-    <div class="redes">
-        <div class="whats">
-            <button class="btn_redes"><a href="https://www.whatsapp.com">Whatsapp</a></button>
+        <div class="sobre">
+            <div class="elementos_2">
+                <img class="img_tela" src="video_game.jpg" alt="Video game adaptado">
+            </div>
+            <div class="elementos_2">
+                <h1>A visão do futuro: meu projeto</h1>
+                <p>Meu projeto consiste em adaptar um console Xbox 360 do zero para acessibilidade.</p>
+                <p>Este projeto integrado ao site servirá como Trabalho de Conclusão de Curso (TCC).</p>
+                <button class="btn-descricao"><a href="index2.html">Você sabia?</a></button>
+            </div>   
         </div>
-        <div class="email">
-            <button class="btn_redes"><a href="www.facebook.com">facebook</a></button>
+
+        <div class="contato">   
+            <div class="redes">
+                <div class="whats">
+                    <button class="btn_redes"><a href="https://www.whatsapp.com" target="_blank" rel="noopener">WhatsApp</a></button>
+                </div>
+                <div class="email">
+                    <button class="btn_redes"><a href="https://www.facebook.com" target="_blank" rel="noopener">Facebook</a></button>
+                </div>
+                <div class="outros">
+                    <button class="btn_redes"><a href="https://www.instagram.com" target="_blank" rel="noopener">Instagram</a></button>
+                </div>
+            </div>
+            
+            <div class="form">
+                <div class="poll-title" style="color: #00e5ff; font-size: 15pt; margin-bottom: 12px;">O que é deficiência visual?</div>
+                <div class="poll" style="width: 100%;">
+                      <input type="text" id="txt-resposta-form" placeholder="Digite sua resposta...">    
+                </div>
+                <div class="poll-buttons">
+                    <button class="btn-action" id="btn-votar-form">Enviar</button>
+                    <button class="btn-action" id="btn-zerar-form">Zerar</button>
+                </div>
+                <div class="poll-results" style="color: #ffffff;">
+                    Total de votos: <span id="votos-total-form">0</span>
+                </div>
+            </div>
         </div>
-        <div class="outros">
-            <button class="btn_redes"><a href="https://www.instagram.com">instagram</a></button>
+
+        <div style="margin: 20px 0;">
+            <button id="btn-descricao" onclick="descreverPagina()">Ouvir descrição acessível da página</button>
         </div>
     </div>
-    <div class="form">
-   
-    </div>
-</div>
 
-
-
-
-<div style="margin: 20          px 0;">
-     <button id="btn-descricao" onclick="descreverPagina()">Ver descrição acessível</button>
-  </div>
-</div>
     <script>
+        // Enquete 1
         let votosRodada = 0;
         let votosTotal = 0;
 
@@ -411,8 +430,33 @@ Deficiencia visual
             txtOpniao.value = "";
         });
 
+        // Enquete 2
+        let votosTotalForm = 0;
+        const btnVotarForm = document.getElementById('btn-votar-form');
+        const btnZerarForm = document.getElementById('btn-zerar-form');
+        const spanTotalForm = document.getElementById('votos-total-form');
+        const txtRespostaForm = document.getElementById('txt-resposta-form');
+
+        btnVotarForm.addEventListener('click', function() {
+            if (txtRespostaForm.value.trim() !== "") {
+                votosTotalForm++;
+                spanTotalForm.textContent = votosTotalForm;
+                txtRespostaForm.value = "";
+                alert("Resposta enviada com sucesso!");
+            } else {
+                alert("Por favor, digite sua resposta antes de enviar!");
+            }
+        });
+
+        btnZerarForm.addEventListener('click', function() {
+            votosTotalForm = 0;
+            spanTotalForm.textContent = votosTotalForm;
+            txtRespostaForm.value = "";
+        });
+
+        // Leitura de Tela (Sintetizador de Voz)
         function descreverPagina() {
-            const descricao = "Descrição visual da página: O site possui tons de azul e roxo. No topo, há o símbolo de acessibilidade com borda azul piscina que muda para uma imagem quadrada de 100px por 100px com um pódio de atletas deficientes em um campo de futebol 4D ao passar o mouse. Em seguida, há o título 'Deficiência Visual' e a introdução sobre o livro 'A visão de um cego'. Abaixo, há uma lista com os tipos de bengala e três cartões explicativos sobre Bengala Longa, Leitores de Tela e Braille. Ao final, há uma caixa de enquete para interagir com a página.";
+            const descricao = "Descrição visual da página: O site possui tons de azul e roxo. No topo, há o símbolo de acessibilidade. Em seguida, o título 'A visão do futuro' e uma introdução. Abaixo, são apresentados os tipos de bengala, ferramentas de acessibilidade, enquetes interativas e informações sobre o TCC de adaptação de video game.";
             
             if ('speechSynthesis' in window) {
                 if (window.speechSynthesis.speaking) {
@@ -428,4 +472,4 @@ Deficiencia visual
         }
     </script>
 </body>
-</html>
+</html> 

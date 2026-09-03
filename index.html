@@ -1,770 +1,424 @@
-                          <!DOCTYPE html>
-<html anlang="pt-B  R">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Braille tatil       acessivel</title>
+  <title>InclusiTec</title>
   <style>
     :root {
+      --bg-color: #0d1b2a;
+      --text-color: #ffffff;
+      --bic-blue: #002d62;
       --neon-blue: #00f3ff;
-      --neon-purple: #9d00ff;
-      --neon-glow: 0 0 15px rgba(0, 243, 255, 0.6), 0 0 30px rgba(0, 243, 255, 0.3);
-      --purple-glow: 0 0 15px rgba(157, 0, 255, 0.6), 0 0 30px rgba(157, 0, 255, 0.3);
-      --bg-dark: #050b14;
-      --card-bg: rgba(10, 20, 38, 0.75);
-      --card-border: rgba(0, 243, 255, 0.4);
-      --text-color: #ffffff;
-      --active-white: #ffffff;
-    }
-
-    /* Alto Contraste (Acessibilidade) */
-    body.high-contrast {
-      --neon-blue: #ffff00;
-      --neon-glow: 0 0 5px #ffff00;
-      --bg-dark: #000000;
-      --card-bg: #000000;
-      --card-border: #ffff00;
-      --text-color: #ffffff;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      --smoke-white: rgba(255, 255, 255, 0.85);
+      --btn-bg: #002d62;
+      --btn-text: #ffffff;
     }
 
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
+      background-color: var(--bg-color);
       color: var(--text-color);
-      background: 
-        radial-gradient(circle at 10% 20%, rgba(157, 0, 255, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(0, 243, 255, 0.15) 0%, transparent 40%),
-        linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)),
-        url('https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
       padding: 20px;
-      overflow-x: hidden;
-    }
-
-    /* Marca d'água de Acessibilidade */
-    body::before {
-      content: "♿";
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 35vw;
-      color: rgba(0, 243, 255, 0.03);
-      text-shadow: var(--neon-glow);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 950px;
-      z-index: 1;
       display: flex;
       flex-direction: column;
-      gap: 22px;
-    }
-
-    header {
-      text-align: center;
-      padding: 30px 20px 25px;
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 2px solid var(--neon-blue);
-      border-radius: 20px;
-      box-shadow: var(--neon-glow);
-      position: relative;
-    }
-
-    /* Logo Circular do Símbolo de Deficiência */
-    .logo-circle {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 15px auto;
-      border-radius: 50%;
-      border: 3px solid var(--neon-blue);
-      background: rgba(5, 11, 20, 0.8);
-      box-shadow: var(--neon-glow);
-      display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3rem;
-      color: var(--neon-blue);
-      text-shadow: var(--neon-glow);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-align: center;
+      transition: background-color 0.35s, color 0.35s;
     }
 
-    .logo-circle:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px var(--neon-blue);
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      text-shadow: var(--neon-glow);
-      margin-bottom: 8px;
-    }
-
-    header p {
-      font-size: 1.1rem;
-      color: var(--neon-blue);
-      letter-spacing: 1px;
-    }
-
-    .accessibility-bar {
+    /* Container 5D com sombra e borda Azul Bic */
+    .app-container {
+      max-width: 750px;
+      width: 90%;
+      background: linear-gradient(145deg, #00122e, #002244);
+      border: 4px solid var(--bic-blue);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 
+        0 10px 25px var(--smoke-white), 
+        0 0 30px var(--neon-blue), 
+        inset 0 0 15px var(--neon-blue);
       display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-bottom: -10px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 2px solid var(--card-border);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: var(--neon-glow);
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .card h2 {
-      font-size: 1.3rem;
-      color: var(--neon-blue);
-      margin-bottom: 15px;
-      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
-    }
-
-    .button-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
     }
 
-    button, .btn-link {
-      background: rgba(0, 243, 255, 0.08);
-      color: #ffffff;
-      border: 2px solid var(--neon-blue);
-      padding: 16px 20px;
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
-      outline: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
+    /* Modo Alto Contraste */
+    body.high-contrast {
+      background-color: #000000 !important;
+      color: #ffff00 !important;
+    }
+    body.high-contrast .app-container {
+      background: #000000 !important;
+      border: 4px solid #ffff00 !important;
+      box-shadow: 0 0 20px #ffff00 !important;
+      color: #ffff00 !important;
+    }
+    body.high-contrast button, 
+    body.high-contrast input, 
+    body.high-contrast textarea, 
+    body.high-contrast table, 
+    body.high-contrast th, 
+    body.high-contrast td {
+      background-color: #000000 !important;
+      color: #ffff00 !important;
+      border-color: #ffff00 !important;
     }
 
-    button:hover, button:focus-visible, .btn-link:hover, .btn-link:focus-visible {
-      background: var(--neon-blue);
-      color: #000000;
-      box-shadow: var(--neon-glow);
-      transform: translateY(-3px);
-    }
-
-    button:active, .btn-link:active {
-      transform: translateY(0);
-    }
-
-    .btn-secondary {
-      border-color: var(--neon-purple);
-      box-shadow: 0 0 10px rgba(157, 0, 255, 0.2);
-    }
-
-    .btn-secondary:hover, .btn-secondary:focus-visible {
-      background: var(--neon-purple);
-      color: #ffffff;
-      box-shadow: var(--purple-glow);
-    }
-
-    /* Caixa de Texto e Tradução */
-    textarea {
-      width: 100%;
-      height: 100px;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid var(--neon-blue);
-      border-radius: 10px;
-      color: #fff;
-      padding: 12px;
-      font-size: 1.1rem;
-      font-family: inherit;
-      resize: vertical;
-      outline: none;
-      margin-bottom: 15px;
-    }
-
-    textarea:focus {
-      border-color: #fff;
-      box-shadow: var(--neon-glow);
-    }
-
-    .output-box {
-      margin-top: 10px;
-      padding: 18px;
-      background: rgba(0, 0, 0, 0.6);
-      border: 2px dashed var(--neon-blue);
-      border-radius: 12px;
-      min-height: 80px;
-      font-size: 1.2rem;
-      word-break: break-word;
-      line-height: 1.6;
-    }
-
-    .braille-output {
+    .top-braille {
       font-size: 2rem;
       letter-spacing: 4px;
-      color: var(--neon-blue);
-      text-shadow: var(--neon-glow);
-      margin-top: 10px;
+      margin-bottom: 2px;
+    }
+    .top-translation {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #80d4ff;
     }
 
-    /* Célula Braille Interativa (Explorador) */
-    .braille-cell-interactive {
-      display: grid;
-      grid-template-columns: repeat(2, 50px);
-      grid-gap: 15px;
-      justify-content: center;
-      margin: 20px auto;
-      padding: 15px;
-      background: rgba(0,0,0,0.5);
-      border-radius: 15px;
-      width: fit-content;
-      border: 1px solid var(--neon-blue);
+    .accessibility-icon {
+      font-size: 3.5rem;
+      margin: 10px 0;
     }
 
-    .dot {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
+    .title-bic {
+      color: var(--bic-blue);
+      background-color: #ffffff;
+      padding: 5px 20px;
+      border-radius: 8px;
+      font-size: 2.2rem;
+      margin: 5px 0;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    button {
+      background-color: var(--btn-bg);
+      color: var(--btn-text);
       border: 2px solid var(--neon-blue);
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .dot.active {
-      background: var(--neon-blue);
-      box-shadow: var(--neon-glow);
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      border-color: #666;
     }
 
-    /* Tabela de Braille */
-    .braille-table-container {
-      margin-top: 15px;
-      max-height: 380px;
-      overflow-y: auto;
-      border: 1px solid var(--neon-blue);
-      border-radius: 10px;
+    button:hover:not(:disabled) {
+      transform: scale(1.03);
+      box-shadow: 0 0 10px var(--neon-blue);
+    }
+
+    textarea {
+      width: 80%;
+      height: 80px;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 1rem;
+      border: 2px solid var(--bic-blue);
+    }
+
+    .braille-output {
+      font-size: 1.8rem;
+      min-height: 40px;
+      word-break: break-all;
+      color: var(--neon-blue);
+    }
+
+    /* Cela Braille Interativa */
+    .braille-cell {
+      display: grid;
+      grid-template-columns: repeat(2, 45px);
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+      justify-content: center;
+    }
+
+    .dot-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      background-color: #333;
+      color: #fff;
+      font-size: 1.1rem;
+    }
+
+    .dot-btn.active {
+      background-color: var(--neon-blue);
+      color: #000;
+      box-shadow: 0 0 12px var(--neon-blue);
+    }
+
+    .hidden {
+      display: none;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      text-align: center;
+      margin-top: 15px;
+      background: rgba(0, 0, 0, 0.4);
     }
 
     th, td {
-      padding: 14px;
-      border: 1px solid rgba(0, 243, 255, 0.2);
+      border: 1px solid var(--neon-blue);
+      padding: 8px;
+      font-size: 0.95rem;
     }
 
-    th {
-      background: rgba(0, 243, 255, 0.25);
-      color: var(--neon-blue);
-      position: sticky;
-      top: 0;
-      backdrop-filter: blur(10px);
-    }
-
-    tr {
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    tr:hover, tr:focus-within {
-      background: rgba(0, 243, 255, 0.2);
-      outline: 2px solid var(--neon-blue);
-    }
-
-    .braille-char {
-      font-size: 2.2rem;
-      color: var(--neon-blue);
-      text-shadow: var(--neon-glow);
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .video-container {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      margin-top: 15px;
-      border-radius: 12px;
-      border: 2px solid var(--neon-blue);
-      box-shadow: var(--neon-glow);
-    }
-
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
+    video {
       width: 100%;
-      height: 100%;
+      max-width: 320px;
+      border-radius: 8px;
     }
-
-    /* Animação do Scanner */
-    .scanning-bar {
-      height: 4px;
-      background: var(--neon-blue);
-      box-shadow: var(--neon-glow);
-      width: 100%;
-      animation: scan 2s infinite ease-in-out;
-      margin-top: 10px;
-    }
-
-    @keyframes scan {
-      0% { transform: translateY(0); opacity: 0.3; }
-      50% { transform: translateY(40px); opacity: 1; }
-      100% { transform: translateY(0); opacity: 0.3; }
-    }
-
-    .active-btn {
-      background: #ffffff !important;
-      color: #000000 !important;
-      box-shadow: 0 0 25px #ffffff !important;
-    }
-
-    /* Responsividade */
-    @media (max-width: 600px) {
-      h1 { font-size: 1.8rem; }
-      .button-grid { grid-template-columns: 1fr; }
-      .card { padding: 16px; }
-      .logo-circle { width: 80px; height: 80px; font-size: 2.4rem; }
-    }
- .a href{
-  color:darkblue;
- }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    
-    <!-- Barra de Acessibilidade -->
-    <div class="accessibility-bar">
-      <button onclick="toggleContrast()" style="padding: 8px 12px; font-size: 0.85rem;" aria-label="Alternar Alto Contraste">
-        🌗 Alto Contraste
-      </button>
+  <div class="app-container">
+    <div>
+      <div class="top-braille">⠊⠝⠉⠇⠥⠎⠊⠞⠑⠉</div>
+      <div class="top-translation">InclusiTec</div>
     </div>
 
-    <header>
-      <!-- Logo Circular com o Símbolo da Deficiência / Acessibilidade -->
-      <div class="logo-circle" aria-hidden="true">
-        ♿
-      </div>
-      <h1>Braille tatil acessivel</h1>
-      <p>Plataforma Inteligente de Tradução, Leitura e Aprendizado em Braille</p>
-    </header>
+    <div class="accessibility-icon" aria-label="Símbolo Internacional de Acessibilidade">♿︎</div>
 
-    <!-- Controles Principais e Leitura por Foto -->
-    <section class="card">
-      <h2>📷 Captura e OCR de Braille</h2>
-      <div class="button-grid">
-        <button onclick="triggerCamera()" aria-label="Tirar foto para ler Braille">
-          📷 Tirar Foto
-        </button>
-        <button onclick="triggerFileSelect()" aria-label="Enviar foto do dispositivo">
-          📁 Enviar Imagem
-        </button>
-        <button id="btnListen" onclick="speakTranslatedText()" aria-label="Ouvir texto traduzido via áudio">
-          🔊 Ouvir Texto Traduzido
-        </button>
+    <button id="btnContrast" onclick="toggleContrast()">Ativar Auto Contraste</button>
+
+    <h1 class="title-bic">INCLUSITEC</h1>
+    <p>O aplicativo de acessibilidade e tradução intuitiva de Braille para todos os usuários.</p>
+
+    <button id="btnCamera" onclick="abrirCamera()">Tirar Foto (Comandado por Voz)</button>
+    
+    <div id="cameraArea" class="hidden">
+      <video id="videoFeed" autoplay playsinline></video>
+      <p><i>Diga "Tirar Foto" em voz alta apontando para o texto Braille...</i></p>
       </div>
 
-      <!-- Inputs Ocultos -->
-      <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="processBrailleImage(event)">
-      <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="processBrailleImage(event)">
+    <input type="file" id="fileInput" accept="image/png, image/jpeg" style="display:none;" onchange="fotoSelecionada()">
+    <button onclick="document.getElementById('fileInput').click()">Selecionar Foto</button>
 
-      <!-- Indicador de Processamento / Scanner -->
-      <div id="scannerAnimation" class="hidden" style="margin-top: 15px; text-align: center;">
-        <p>🔍 Analisando pontos Braille na imagem...</p>
-        <div class="scanning-bar"></div>
-      </div>
-    </section>
+    <button id="btnOuvirTraducao" disabled onclick="ouvirTraducaoImagem()">Ouvir Tradução da Imagem</button>
 
-    <!-- Tradutor em Tempo Real (Texto <-> Braille) -->
-    <section class="card">
-      <h2>✍️ Tradutor em Tempo Real (Texto para Braille)</h2>
-      <label for="textInput" class="hidden">Digite o texto para converter:</label>
-      <textarea id="textInput" placeholder="Digite uma frase aqui para ver a conversão imediata em Braille..." oninput="translateLiveText()"></textarea>
+    <hr style="width:100%; border-color:var(--bic-blue);">
 
-      <h2>Resultado em Português:</h2>
-      <div id="translatedOutput" class="output-box" tabindex="0">
-        Nenhuma imagem carregada ou texto inserido. Digite acima ou envie uma foto.
-      </div>
+    <label for="txtInput"><b>Digite um texto para traduzir em Braille:</b></label>
+    <textarea id="txtInput" placeholder="Digite aqui..." oninput="traduzirTexto()"></textarea>
+    <div id="brailleResult" class="braille-output"></div>
 
-      <h2 style="margin-top: 15px;">Correspondente em Braille:</h2>
-      <div id="brailleOutput" class="output-box braille-output" tabindex="0">
-        ⠀
-      </div>
-    </section>
+    <hr style="width:100%; border-color:var(--bic-blue);">
 
-    <!-- Explorador Interativo de Célula Braille (6 Pontos) -->
-    <section class="card">
-      <h2>⠿ Célula Braille Interativa (Toque nos pontos)</h2>
-      <p style="text-align: center; color: rgba(255,255,255,0.8);">Clique nos pontos para montar o caractere e ouvir a letra correspondente:</p>
-      
-      <div class="braille-cell-interactive">
-        <div class="dot" data-dot="1" onclick="toggleDot(this)"></div>
-        <div class="dot" data-dot="4" onclick="toggleDot(this)"></div>
-        <div class="dot" data-dot="2" onclick="toggleDot(this)"></div>
-        <div class="dot" data-dot="5" onclick="toggleDot(this)"></div>
-        <div class="dot" data-dot="3" onclick="toggleDot(this)"></div>
-        <div class="dot" data-dot="6" onclick="toggleDot(this)"></div>
-      </div>
-      <div style="text-align: center;">
-        <p id="interactiveResult" style="font-size: 1.4rem; color: var(--neon-blue);">Caractere: -</p>
-      </div>
-    </section>
+    <h3>Cela Braille Interativa</h3>
+    <p>Marque os pontos para formar a letra:</p>
+    <div class="braille-cell">
+      <button class="dot-btn" onclick="toggleDot(1)">1</button>
+      <button class="dot-btn" onclick="toggleDot(4)">4</button>
+      <button class="dot-btn" onclick="toggleDot(2)">2</button>
+      <button class="dot-btn" onclick="toggleDot(5)">5</button>
+      <button class="dot-btn" onclick="toggleDot(3)">3</button>
+      <button class="dot-btn" onclick="toggleDot(6)">6</button>
+    </div>
+    <p>Letra formada: <b id="celaResultado">-</b></p>
 
-    <!-- Seção Aprender Braille (Tabela do Alfabeto) -->
-    <section class="card">
-      <button id="btnLearn" onclick="toggleBrailleTable()" style="width: 100%;" class="btn-secondary">
-        📖 Abrir Tabela do Alfabeto Braille Completo
-      </button>
-      
-      <div id="brailleTableContainer" class="braille-table-container hidden">
-        <table>
-          <thead>
-            <tr>
-              <th>Letra / Caractere</th>
-              <th>Símbolo Braille</th>
-            </tr>
-          </thead>
-          <tbody id="brailleTableBody">
-            <!-- Preenchido dinamicamente via JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <hr style="width:100%; border-color:var(--bic-blue);">
 
-    <!-- Vídeo Educativo -->
-    <section class="card">
-      <button onclick="toggleVideo()" style="width: 100%;">
-        🎥 Assistir Vídeo: Como Funciona o Sistema Braille
-      </button>
-      <div id="videoWrapper" class="hidden">
-        <div class="video-container">
-          <iframe id="youtubeIframe" src="" title="Curso Básico de Braille" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-      </div>
-    </section>
+    <button onclick="toggleTabela()">Aprender Braille</button>
 
-    <!-- Audiodescrição da Página -->
-    <section class="card">
-      <button id="btnDescription" onclick="toggleAudioDescription()" style="width: 100%;" class="btn-secondary">
-        👁️ Audiodescrição da Página (Ativar / Desativar)
-      </button>
-    </section>
+    <div id="tabelaBraille" class="hidden">
+      <table>
+        <thead>
+          <tr><th>Categoria</th><th>Caractere</th><th>Braille</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Alfabeto</td><td>A / B / C</td><td>⠁ / ⠃ / ⠉</td></tr>
+          <tr><td>Números</td><td>1 / 2 / 3</td><td>⠼⠁ / ⠼⠃ / ⠼⠉</td></tr>
+          <tr><td>Acentuadas</td><td>Á / É / Í</td><td>⠷ / ⠮ / ⠌</td></tr>
+          <tr><td>Matemática</td><td>+ / - / =</td><td>⠬ / ⠤ / ⠰⠆</td></tr>
+          <tr><td>Gramática</td><td>. / , / ?</td><td>⠲ / ⠂ / ⠦</td></tr>
+        </tbody>
+      </table>
+      <br>
+      <button onclick="window.open('https://www.youtube.com/watch?v=k3B_4M1c6I4', '_blank')">Saber Mais (Vídeo do YouTube)</button>
+    </div>
 
-    <!-- Seção Informativa Final -->
-    <section class="card" style="text-align: center;">
-      <h2 style="justify-content: center; margin-bottom: 12px;">Você sabe o que é deficiência visual?</h2>
-      <a href="indexi1.html" class="btn-link" style="max-width: 250px; margin: 0 auto;">Saiba mais</a>
-    </section>
+    <hr style="width:100%; border-color:var(--bic-blue);">
 
+    <button onclick="window.location.href='loja.html'">Acesse minha loja aqui</button>
+<br>
+    <button id="btnDescricao" onclick="toggleDescricaoVisual()">Ver Descrição Visual da Página</button>
   </div>
 
   <script>
-    /* ==========================================================================
-       1. Mapeamento do Alfabeto e Símbolos Braille
-       ========================================================================== */
-    const brailleMap = {
-      'a': '⠁', 'b': '⠃', 'c': '⠉', 'd': '⠙', 'e': '⠑', 'f': '⠋', 'g': '⠛', 'h': '⠓',
-      'i': '⠊', 'j': '⠚', 'k': '⠅', 'l': '⠇', 'm': '⠍', 'n': '⠝', 'o': '⠕', 'p': '⠏',
-      'q': '⠟', 'r': '⠗', 's': '⠎', 't': '⠞', 'u': '⠥', 'v': '⠧', 'w': '⠺', 'x': '⠭',
-      'y': '⠽', 'z': '⠵', 'á': '⠷', 'é': '⠿', 'í': '⠌', 'ó': '⠹', 'ú': '⠬', 'ã': '⠯', 'õ': '⠡', 'ç': '⠯',
-      '1': '⠁', '2': '⠃', '3': '⠉', '4': '⠙', '5': '⠑', '6': '⠋', '7': '⠛', '8': '⠓', '9': '⠊', '0': '⠚',
-      ' ': ' ', '.': '⠲', ',': '⠂', '!': '⠔', '?': '⠢'
-    };
-
-    // Mapeamento inverso (Braille -> Texto)
-    const reverseBrailleMap = {};
-    Object.keys(brailleMap).forEach(key => {
-      reverseBrailleMap[brailleMap[key]] = key;
-    });
-
-    // Mapeamento de Pontos da Célula para Caractere Braille (Unicode)
-    const dotToUnicodeMap = {
-      '1': '⠁',     '12': '⠃',    '14': '⠉',    '145': '⠙',   '15': '⠑',    '124': '⠋',
-      '1245': '⠛',  '125': '⠓',   '24': '⠊',    '245': '⠚',   '13': '⠅',    '123': '⠇',
-      '134': '⠍',   '1345': '⠝',  '135': '⠕',   '1234': '⠏',  '12345': '⠟', '1235': '⠗',
-      '234': '⠎',   '2345': '⠞',  '136': '⠥',   '1236': '⠧',  '2456': '⠺', '1346': '⠭',
-      '13456': '⠽', '1356': '⠵'
-    };
-
-    let isAudioDescribing = false;
-    let audioCtx = null;
-
-    /* ==========================================================================
-       2. Sintetizador de Voz (Text-to-Speech)
-       ========================================================================== */
-    function speak(text, priority = false) {
-      if (!('speechSynthesis' in window)) {
-        alert('Seu navegador não suporta leitura por áudio.');
-        return;
-      }
-
-      if (priority) {
+    // Sintetizador de Voz (Text-To-Speech)
+    function falar(texto) {
+      if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(texto);
+        msg.lang = 'pt-BR';
+        window.speechSynthesis.speak(msg);
       }
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'pt-BR';
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-
-      const voices = window.speechSynthesis.getVoices();
-      const ptVoice = voices.find(v => v.lang.includes('pt') || v.lang.includes('PT'));
-      if (ptVoice) {
-        utterance.voice = ptVoice;
-      }
-
-      window.speechSynthesis.speak(utterance);
     }
 
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-      };
+    // Auto Contraste
+    function toggleContrast() {
+      const isContrast = document.body.classList.toggle('high-contrast');
+      const msg = isContrast ? "Modo de alto contraste ativado" : "Modo de alto contraste desativado";
+      falar(msg);
     }
 
-    /* ==========================================================================
-       3. Funções do Botão "Ouvir Texto Traduzido"
-       ========================================================================== */
-    function speakTranslatedText() {
-      const textOutput = document.getElementById('translatedOutput').innerText.trim();
-      const textInput = document.getElementById('textInput').value.trim();
-      
-      const contentToRead = textInput || textOutput;
+    // Mapa Braille simples
+    const mapBraille = {
+      'a':'⠁', 'b':'⠃', 'c':'⠉', 'd':'⠙', 'e':'⠑', 'f':'⠋', 'g':'⠛', 'h':'⠃', 'i':'⠊', 'j':'⠚',
+      'k':'⠅', 'l':'⠇', 'm':'⠍', 'n':'⠝', 'o':'⠕', 'p':'⠏', 'q':'⠟', 'r':'⠗', 's':'⠎', 't':'⠞',
+      'u':'⠥', 'v':'⠧', 'w':'⠺', 'x':'⠭', 'y':'⠽', 'z':'⠵', ' ': ' '
+    };
 
-      if (!contentToRead || contentToRead.includes('Nenhuma imagem carregada')) {
-        speak('Nenhum texto disponível para leitura no momento.', true);
-        return;
-      }
-
-      const btn = document.getElementById('btnListen');
-      btn.classList.add('active-btn');
-      
-      speak(`Lendo texto: ${contentToRead}`, true);
-
-      setTimeout(() => {
-        btn.classList.remove('active-btn');
-      }, 3000);
-    }
-
-    /* ==========================================================================
-       4. Tradução ao Vivo (Texto -> Braille)
-       ========================================================================== */
-    function translateLiveText() {
-      const input = document.getElementById('textInput').value.toLowerCase();
-      const outputBox = document.getElementById('translatedOutput');
-      const brailleBox = document.getElementById('brailleOutput');
-
-      if (input.trim() === '') {
-        outputBox.innerText = 'Nenhuma imagem carregada ou texto inserido. Digite acima ou envie uma foto.';
-        brailleBox.innerText = '⠀';
-        return;
-      }
-
-      outputBox.innerText = input.toUpperCase();
-
-      let brailleResult = '';
+    function traduzirTexto() {
+      const input = document.getElementById('txtInput').value.toLowerCase();
+      let res = '';
       for (let char of input) {
-        brailleResult += brailleMap[char] || char;
+        res += mapBraille[char] || char;
       }
-
-      brailleBox.innerText = brailleResult;
+      document.getElementById('brailleResult').innerText = res;
     }
 
-    /* ==========================================================================
-       5. Processamento e Leitura de Foto (Simulador OCR Braille)
-       ========================================================================== */
-    function triggerCamera() {
-      document.getElementById('cameraInput').click();
-    }
+    // Câmera & Reconhecimento de Voz "Tirar Foto"
+    let streamRef = null;
+    let traducaoSimulada = "";
 
-    function triggerFileSelect() {
-      document.getElementById('fileInput').click();
-    }
+    async function abrirCamera() {
+      const area = document.getElementById('cameraArea');
+      area.classList.remove('hidden');
+      falar("Câmera aberta. Aponte para o texto em braille e diga tirar foto.");
 
-    function processBrailleImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const scannerAnim = document.getElementById('scannerAnimation');
-      scannerAnim.classList.remove('hidden');
-
-      speak('Imagem recebida. Iniciando escaneamento e tradução do Braille.', true);
-
-      setTimeout(() => {
-        scannerAnim.classList.add('hidden');
-
-        const mockPhrases = [
-          "BEM VINDO AO ACESSIVEL STUDIO",
-          "ACESSIBILIDADE PARA TODOS",
-          "APRENDER BRAILLE E FACIL E DIVERTIDO",
-          "INCLUSAO E AUTONOMIA"
-        ];
-        const randomPhrase = mockPhrases[Math.floor(Math.random() * mockPhrases.length)];
-
-        document.getElementById('textInput').value = randomPhrase;
-        translateLiveText();
-
-        speak(`Tradução concluída com sucesso. O texto identificado foi: ${randomPhrase}`);
-      }, 2200);
-    }
-
-    /* ==========================================================================
-       6. Célula Braille Interativa (Toque nos pontos)
-       ========================================================================== */
-    function toggleDot(element) {
-      element.classList.toggle('active');
-      playBeepSound();
-      updateInteractiveCell();
-    }
-
-    function updateInteractiveCell() {
-      const activeDots = Array.from(document.querySelectorAll('.dot.active'))
-        .map(dot => dot.getAttribute('data-dot'))
-        .sort()
-        .join('');
-
-      const resBox = document.getElementById('interactiveResult');
-      const symbol = dotToUnicodeMap[activeDots] || '⠿';
-      const letter = reverseBrailleMap[symbol] || '-';
-
-      if (activeDots === '') {
-        resBox.innerText = 'Caractere: -';
-      } else {
-        resBox.innerText = `Caractere: ${symbol} (${letter.toUpperCase()})`;
-        speak(`Letra ${letter.toUpperCase()}`, true);
+      try {
+        streamRef = await navigator.mediaDevices.getUserMedia({ video: true });
+        document.getElementById('videoFeed').srcObject = streamRef;
+        iniciarEscutaVoz();
+      } catch (e) {
+        alert("Não foi possível acessar a câmera.");
       }
     }
 
-    /* ==========================================================================
-       7. Tabela Completa e Som de Feedback (Web Audio API)
-       ========================================================================== */
-    window.addEventListener('DOMContentLoaded', () => {
-      const tbody = document.getElementById('brailleTableBody');
-      
-      Object.keys(brailleMap).forEach(char => {
-        if (char.length === 1 && char.match(/[a-z0-9]/i)) {
-          const row = document.createElement('tr');
-          row.tabIndex = 0;
-          row.innerHTML = `
-            <td><strong>${char.toUpperCase()}</strong></td>
-            <td class="braille-char">${brailleMap[char]}</td>
-          `;
+    function iniciarEscutaVoz() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return;
 
-          row.addEventListener('click', () => {
-            playBeepSound();
-            speak(`Letra ${char.toUpperCase()}, em Braille é ${brailleMap[char]}`);
-          });
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = true;
 
-          row.addEventListener('focus', () => {
-            playBeepSound();
-            speak(`Letra ${char.toUpperCase()}`);
-          });
+      recognition.onresult = (event) => {
+        const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+        if (transcript.includes("tirar foto")) {
+          recognition.stop();
+          capturarFoto();
+        }
+      };
+      recognition.start();
+    }
 
-          tbody.appendChild(row);
+    function capturarFoto() {
+      if (streamRef) {
+        streamRef.getTracks().forEach(track => track.stop());
+      }
+      document.getElementById('cameraArea').classList.add('hidden');
+      traducaoSimulada = "Texto Braille traduzido: Bem-vindo ao InclusiTec!";
+      document.getElementById('btnOuvirTraducao').disabled = false;
+      falar("Foto tirada com sucesso. Tradução concluída.");
+    }
+
+    function fotoSelecionada() {
+      traducaoSimulada = "Texto da foto selecionada: Acessibilidade e Inclusão.";
+      document.getElementById('btnOuvirTraducao').disabled = false;
+      falar("Foto selecionada. Tradução pronta.");
+    }
+
+    function ouvirTraducaoImagem() {
+      falar(traducaoSimulada);
+    }
+
+    // Cela Braille Interativa
+    const activeDots = new Set();
+    const mapDotsToChar = {
+      '1': 'A', '1,2': 'B', '1,4': 'C', '1,4,5': 'D', '1,5': 'E',
+      '1,2,4': 'F', '1,2,4,5': 'G', '1,2,5': 'H', '2,4': 'I', '2,4,5': 'J',
+      '1,3': 'K', '1,2,3': 'L', '1,3,4': 'M', '1,3,4,5': 'N', '1,3,5': 'O',
+      '1,2,3,4': 'P', '1,2,3,4,5': 'Q', '1,2,3,5': 'R', '2,3,4': 'S', '2,3,4,5': 'T',
+      '1,3,6': 'U', '1,2,3,6': 'V', '2,4,5,6': 'W', '1,3,4,6': 'X', '1,3,4,5,6': 'Y', '1,3,5,6': 'Z'
+    };
+
+    function toggleDot(num) {
+      const btns = document.querySelectorAll('.dot-btn');
+      btns.forEach(btn => {
+        if (btn.innerText == num) {
+          btn.classList.toggle('active');
         }
       });
-    });
 
-    function playBeepSound() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(520, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.12);
-    }
-
-    /* ==========================================================================
-       8. Controles de Interface e Alternadores (Tabela, Vídeo, Contraste)
-       ========================================================================== */
-    function toggleBrailleTable() {
-      const container = document.getElementById('brailleTableContainer');
-      container.classList.toggle('hidden');
-      const isHidden = container.classList.contains('hidden');
-      speak(isHidden ? 'Tabela oculta.' : 'Tabela de Braille aberta.');
-    }
-
-    function toggleVideo() {
-      const wrapper = document.getElementById('videoWrapper');
-      const iframe = document.getElementById('youtubeIframe');
-      
-      wrapper.classList.toggle('hidden');
-      
-      if (!wrapper.classList.contains('hidden')) {
-        iframe.src = "https://www.youtube-nocookie.com/embed/5T8L3v1bpt4?autoplay=1";
-        speak('Carregando vídeo educativo sobre o sistema Braille.');
+      if (activeDots.has(num)) {
+        activeDots.delete(num);
       } else {
-        iframe.src = "";
+        activeDots.add(num);
+      }
+
+      const key = Array.from(activeDots).sort().join(',');
+      const letra = mapDotsToChar[key] || '?';
+      document.getElementById('celaResultado').innerText = letra;
+
+      if (letra !== '?') {
+        falar("Letra " + letra);
+      } else {
+        falar("Ponto " + num);
       }
     }
 
-    function toggleContrast() {
-      document.body.classList.toggle('high-contrast');
-      const isHigh = document.body.classList.contains('high-contrast');
-      speak(isHigh ? 'Modo Alto Contraste ativado.' : 'Modo Neon padrão ativado.');
+    // Tabela Expandível
+    function toggleTabela() {
+      const tab = document.getElementById('tabelaBraille');
+      tab.classList.toggle('hidden');
+      falar(tab.classList.contains('hidden') ? "Tabela fechada" : "Tabela de Braille expandida");
     }
 
-    function toggleAudioDescription() {
-      const btn = document.getElementById('btnDescription');
-      isAudioDescribing = !isAudioDescribing;
+    // Descrição Visual da Página
+    let lendoDescricao = false;
+    const textoDescricaoVisual = "A página possui um topo com o texto InclusiTec em Braille e em português. Possui um fundo escuro com efeito tridimensional em tons de azul neon e bordas em azul bic. Contém o símbolo internacional de acessibilidade, botões de comando para alto contraste, captura de câmera por voz, leitura de arquivos de foto, tradutor direto de texto digitado em Braille, cela interativa com feedback de áudio, tabela de aprendizado e link para a loja.";
 
-      if (isAudioDescribing) {
-        btn.classList.add('active-btn');
-        const text = "Você está no Acessível Studio. A página contém uma área para tirar foto de textos em Braille, um tradutor de texto em tempo real, uma célula interativa de 6 pontos para aprender o alfabeto, a tabela completa de símbolos e um vídeo explicativo.";
-        speak(text, true);
+    function toggleDescricaoVisual() {
+      if (!lendoDescricao) {
+        lendoDescricao = true;
+        falar(textoDescricaoVisual);
       } else {
-        btn.classList.remove('active-btn');
+        desativarDescricao();
+      }
+    }
+
+    function desativarDescricao() {
+      if (lendoDescricao) {
         window.speechSynthesis.cancel();
-        speak("Audiodescrição desativada.", true);
+        lendoDescricao = false;
       }
     }
-  </script> 
-  <a href="loja.html">Acesse minha loja aqui</a>
+
+    // Interromper descrição ao apertar Enter novamente
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        desativarDescricao();
+      }
+    });
+  </script>
 </body>
-</html>    
+</html>
