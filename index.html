@@ -1,424 +1,617 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InclusiTec</title>
-  <style>
-    :root {
-      --bg-color: #0d1b2a;
-      --text-color: #ffffff;
-      --bic-blue: #002d62;
-      --neon-blue: #00f3ff;
-      --smoke-white: rgba(255, 255, 255, 0.85);
-      --btn-bg: #002d62;
-      --btn-text: #ffffff;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inclusitec - Leitor de Braille e Tela</title>
+    <link rel="manifest" href="data:application/manifest+json,{
+        %22name%22:%22Inclusitec%22,
+        %22short_name%22:%22Inclusitec%22,
+        %22start_url%22:%22/%22,
+        %22display%22:%22standalone%22,
+        %22background_color%22:%22%23000511%22,
+        %22theme_color%22:%22%2300f3ff%22
+    }">
+    <style>
+        :root {
+            --bg-color: #030814;
+            --card-bg: rgba(0, 30, 60, 0.6);
+            --text-color: #00f3ff;
+            --accent-color: #00f3ff;
+            --border-glow: #00f3ff;
+            --shadow-5d: 0 20px 50px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.4);
+            --btn-bg: linear-gradient(145deg, #002244, #001122);
+            --talkback-focus: #00ff66;
+        }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      transition: background-color 0.35s, color 0.35s;
-    }
+        .high-contrast {
+            --bg-color: #000000 !important;
+            --card-bg: #000000 !important;
+            --text-color: #ffff00 !important;
+            --accent-color: #ffff00 !important;
+            --border-glow: #ffff00 !important;
+            --shadow-5d: 0 0 25px #ffff00, inset 0 0 10px #ffff00 !important;
+            --btn-bg: #000000 !important;
+            --talkback-focus: #00ffff !important;
+        }
 
-    /* Container 5D com sombra e borda Azul Bic */
-    .app-container {
-      max-width: 750px;
-      width: 90%;
-      background: linear-gradient(145deg, #00122e, #002244);
-      border: 4px solid var(--bic-blue);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 
-        0 10px 25px var(--smoke-white), 
-        0 0 30px var(--neon-blue), 
-        inset 0 0 15px var(--neon-blue);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s ease;
+        }
 
-    /* Modo Alto Contraste */
-    body.high-contrast {
-      background-color: #000000 !important;
-      color: #ffff00 !important;
-    }
-    body.high-contrast .app-container {
-      background: #000000 !important;
-      border: 4px solid #ffff00 !important;
-      box-shadow: 0 0 20px #ffff00 !important;
-      color: #ffff00 !important;
-    }
-    body.high-contrast button, 
-    body.high-contrast input, 
-    body.high-contrast textarea, 
-    body.high-contrast table, 
-    body.high-contrast th, 
-    body.high-contrast td {
-      background-color: #000000 !important;
-      color: #ffff00 !important;
-      border-color: #ffff00 !important;
-    }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            border: 2px solid var(--border-glow);
+            box-shadow: var(--shadow-5d);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
 
-    .top-braille {
-      font-size: 2rem;
-      letter-spacing: 4px;
-      margin-bottom: 2px;
-    }
-    .top-translation {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #80d4ff;
-    }
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--accent-color);
+        }
 
-    .accessibility-icon {
-      font-size: 3.5rem;
-      margin: 10px 0;
-    }
+        .btn {
+            background: var(--btn-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-glow);
+            padding: 12px 24px;
+            margin: 8px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
 
-    .title-bic {
-      color: var(--bic-blue);
-      background-color: #ffffff;
-      padding: 5px 20px;
-      border-radius: 8px;
-      font-size: 2.2rem;
-      margin: 5px 0;
-      text-transform: uppercase;
-      font-weight: 900;
-    }
+        .btn:hover, .btn:focus {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 12px 25px var(--border-glow);
+        }
 
-    button {
-      background-color: var(--btn-bg);
-      color: var(--btn-text);
-      border: 2px solid var(--neon-blue);
-      padding: 12px 24px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+        /* --- TALKBACK VISUAL FOCUS FRAME --- */
+        .talkback-active .tb-target:focus,
+        .talkback-active .tb-focused {
+            outline: 4px solid var(--talkback-focus) !important;
+            outline-offset: 4px !important;
+            box-shadow: 0 0 20px var(--talkback-focus), inset 0 0 10px var(--talkback-focus) !important;
+            border-radius: 8px;
+            animation: talkbackPulse 1.5s infinite alternate;
+        }
 
-    button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      border-color: #666;
-    }
+        @keyframes talkbackPulse {
+            0% { outline-color: var(--talkback-focus); }
+            100% { outline-color: #ffffff; }
+        }
 
-    button:hover:not(:disabled) {
-      transform: scale(1.03);
-      box-shadow: 0 0 10px var(--neon-blue);
-    }
+        /* Talkback Control Bar (Inferior) */
+        .talkback-bar {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 760px;
+            background: rgba(0, 15, 30, 0.95);
+            border: 2px solid var(--talkback-focus);
+            border-radius: 30px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0, 255, 102, 0.3);
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
 
-    textarea {
-      width: 80%;
-      height: 80px;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 1rem;
-      border: 2px solid var(--bic-blue);
-    }
+        .tb-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--talkback-focus);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-    .braille-output {
-      font-size: 1.8rem;
-      min-height: 40px;
-      word-break: break-all;
-      color: var(--neon-blue);
-    }
+        .tb-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff3333;
+            box-shadow: 0 0 8px #ff3333;
+        }
 
-    /* Cela Braille Interativa */
-    .braille-cell {
-      display: grid;
-      grid-template-columns: repeat(2, 45px);
-      gap: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-      justify-content: center;
-    }
+        .tb-indicator.active {
+            background-color: #00ff66;
+            box-shadow: 0 0 8px #00ff66;
+        }
 
-    .dot-btn {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      background-color: #333;
-      color: #fff;
-      font-size: 1.1rem;
-    }
+        .tb-toggle-btn {
+            background: #00ff66;
+            color: #000;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-    .dot-btn.active {
-      background-color: var(--neon-blue);
-      color: #000;
-      box-shadow: 0 0 12px var(--neon-blue);
-    }
+        .tb-toggle-btn:hover {
+            transform: scale(1.05);
+        }
 
-    .hidden {
-      display: none;
-    }
+        .spacer {
+            height: 20px;
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      background: rgba(0, 0, 0, 0.4);
-    }
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-color);
+            border: 2px solid var(--border-glow);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 1.2rem;
+            box-sizing: border-box;
+            box-shadow: inset 0 0 10px var(--border-glow);
+            outline: none;
+        }
 
-    th, td {
-      border: 1px solid var(--neon-blue);
-      padding: 8px;
-      font-size: 0.95rem;
-    }
+        .braille-output {
+            font-size: 2rem;
+            min-height: 50px;
+            padding: 10px;
+            border: 1px dashed var(--border-glow);
+            border-radius: 8px;
+            margin-top: 10px;
+            word-break: break-all;
+        }
 
-    video {
-      width: 100%;
-      max-width: 320px;
-      border-radius: 8px;
-    }
-  </style>
+        .braille-cell {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 120px;
+            margin: 20px auto;
+            padding: 15px;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid var(--border-glow);
+            border-radius: 15px;
+            box-shadow: var(--shadow-5d);
+            outline: none;
+        }
+
+        .dot {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid var(--border-glow);
+            background: transparent;
+            cursor: pointer;
+            box-shadow: inset 0 0 5px var(--border-glow);
+            outline: none;
+        }
+
+        .dot.active {
+            background-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .table-learn {
+            display: none;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-glow);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .learn-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            outline: none;
+            cursor: pointer;
+        }
+
+        video, canvas {
+            display: none;
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 2px solid var(--border-glow);
+        }
+    </style>
 </head>
-<body>
+<body class="talkback-active">
 
-  <div class="app-container">
-    <div>
-      <div class="top-braille">⠊⠝⠉⠇⠥⠎⠊⠞⠑⠉</div>
-      <div class="top-translation">InclusiTec</div>
-    </div>
-
-    <div class="accessibility-icon" aria-label="Símbolo Internacional de Acessibilidade">♿︎</div>
-
-    <button id="btnContrast" onclick="toggleContrast()">Ativar Auto Contraste</button>
-
-    <h1 class="title-bic">INCLUSITEC</h1>
-    <p>O aplicativo de acessibilidade e tradução intuitiva de Braille para todos os usuários.</p>
-
-    <button id="btnCamera" onclick="abrirCamera()">Tirar Foto (Comandado por Voz)</button>
+<div class="container" id="mainContainer">
+    <h1 class="tb-target" tabindex="0" data-tb-role="Título nível 1">Inclusitec</h1>
     
-    <div id="cameraArea" class="hidden">
-      <video id="videoFeed" autoplay playsinline></video>
-      <p><i>Diga "Tirar Foto" em voz alta apontando para o texto Braille...</i></p>
-      </div>
+    <button class="btn tb-target" id="contrastBtn" onclick="toggleContrast()">Alto Contraste</button>
+    
+    <p id="appDef" class="tb-target" tabindex="0" data-tb-role="Descrição do aplicativo">
+        <strong>O Inclusitec</strong> é uma plataforma acessível em 5D desenvolvida para leitura, tradução e aprendizado interativo do sistema Braille, promovendo inclusão visual por voz, toque e haptividade.
+    </p>
 
-    <input type="file" id="fileInput" accept="image/png, image/jpeg" style="display:none;" onchange="fotoSelecionada()">
-    <button onclick="document.getElementById('fileInput').click()">Selecionar Foto</button>
+    <button class="btn tb-target" onclick="startVoiceCamera()">Tirar Foto (Comando de Voz)</button>
+    <video id="videoFeed" autoplay playsinline></video>
+    <canvas id="photoCanvas"></canvas>
+    <br>
+    
+    <button class="btn tb-target" onclick="document.getElementById('fileInput').click()">Selecionar Arquivo de Mídia</button>
+    <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this)">
+    <br>
+    
+    <button class="btn tb-target" onclick="speakText(document.getElementById('brailleResult').innerText || 'Nenhum texto traduzido')">Ouvir Tradução</button>
 
-    <button id="btnOuvirTraducao" disabled onclick="ouvirTraducaoImagem()">Ouvir Tradução da Imagem</button>
+    <div class="spacer"></div>
 
-    <hr style="width:100%; border-color:var(--bic-blue);">
+    <label for="textInput" class="tb-target" tabindex="0">Digite para traduzir em Braille:</label>
+    <textarea id="textInput" class="tb-target" oninput="translateToBraille()" placeholder="Digite seu texto aqui..."></textarea>
+    
+    <label class="tb-target" tabindex="0" id="brailleLabel">Resultado da tradução em Braille:</label>
+    <div class="braille-output tb-target" id="brailleResult" tabindex="0" aria-live="polite" aria-labelledby="brailleLabel"></div>
 
-    <label for="txtInput"><b>Digite um texto para traduzir em Braille:</b></label>
-    <textarea id="txtInput" placeholder="Digite aqui..." oninput="traduzirTexto()"></textarea>
-    <div id="brailleResult" class="braille-output"></div>
+    <div class="spacer"></div>
 
-    <hr style="width:100%; border-color:var(--bic-blue);">
-
-    <h3>Cela Braille Interativa</h3>
-    <p>Marque os pontos para formar a letra:</p>
-    <div class="braille-cell">
-      <button class="dot-btn" onclick="toggleDot(1)">1</button>
-      <button class="dot-btn" onclick="toggleDot(4)">4</button>
-      <button class="dot-btn" onclick="toggleDot(2)">2</button>
-      <button class="dot-btn" onclick="toggleDot(5)">5</button>
-      <button class="dot-btn" onclick="toggleDot(3)">3</button>
-      <button class="dot-btn" onclick="toggleDot(6)">6</button>
-    </div>
-    <p>Letra formada: <b id="celaResultado">-</b></p>
-
-    <hr style="width:100%; border-color:var(--bic-blue);">
-
-    <button onclick="toggleTabela()">Aprender Braille</button>
-
-    <div id="tabelaBraille" class="hidden">
-      <table>
-        <thead>
-          <tr><th>Categoria</th><th>Caractere</th><th>Braille</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Alfabeto</td><td>A / B / C</td><td>⠁ / ⠃ / ⠉</td></tr>
-          <tr><td>Números</td><td>1 / 2 / 3</td><td>⠼⠁ / ⠼⠃ / ⠼⠉</td></tr>
-          <tr><td>Acentuadas</td><td>Á / É / Í</td><td>⠷ / ⠮ / ⠌</td></tr>
-          <tr><td>Matemática</td><td>+ / - / =</td><td>⠬ / ⠤ / ⠰⠆</td></tr>
-          <tr><td>Gramática</td><td>. / , / ?</td><td>⠲ / ⠂ / ⠦</td></tr>
-        </tbody>
-      </table>
-      <br>
-      <button onclick="window.open('https://www.youtube.com/watch?v=k3B_4M1c6I4', '_blank')">Saber Mais (Vídeo do YouTube)</button>
+    <div style="text-align: center;">
+        <label class="tb-target" tabindex="0" id="cellLabel">Cela Braille Interativa (Alterne os pontos para ouvir a letra):</label>
+        <div class="braille-cell tb-target" id="brailleCell" tabindex="0" onkeydown="handleCellKeyDown(event)" data-tb-role="Cela Braille" aria-labelledby="cellLabel">
+            <button class="dot tb-target" id="dot1" onclick="toggleDot(1)" data-tb-label="Ponto 1" aria-pressed="false"></button>
+            <button class="dot tb-target" id="dot4" onclick="toggleDot(4)" data-tb-label="Ponto 4" aria-pressed="false"></button>
+            <button class="dot tb-target" id="dot2" onclick="toggleDot(2)" data-tb-label="Ponto 2" aria-pressed="false"></button>  
+            <button class="dot tb-target" id="dot5" onclick="toggleDot(5)" data-tb-label="Ponto 5" aria-pressed="false"></button>
+            <button class="dot tb-target" id="dot3" onclick="toggleDot(3)" data-tb-label="Ponto 3" aria-pressed="false"></button>
+            <button class="dot tb-target" id="dot6" onclick="toggleDot(6)" data-tb-label="Ponto 6" aria-pressed="false"></button>
+        </div>
     </div>
 
-    <hr style="width:100%; border-color:var(--bic-blue);">
+    <div class="spacer"></div>
 
-    <button onclick="window.location.href='loja.html'">Acesse minha loja aqui</button>
-<br>
-    <button id="btnDescricao" onclick="toggleDescricaoVisual()">Ver Descrição Visual da Página</button>
-  </div>
+    <button class="btn tb-target" onclick="toggleLearnTable()">Aprender Braille</button> 
+    <div class="table-learn" id="learnTable"></div>
 
-  <script>
-    // Sintetizador de Voz (Text-To-Speech)
-    function falar(texto) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(texto);
-        msg.lang = 'pt-BR';
-        window.speechSynthesis.speak(msg);
-      }
+    <button class="btn tb-target" onclick="window.open('https://www.youtube.com/results?search_query=como+aprender+braille', '_blank')">Saiba Mais (Vídeo no YouTube)</button>
+    
+    <div class="spacer"></div>
+
+    <button class="btn tb-target" onclick="describePage()">Ver Descrição Visual da Página</button>
+</div>
+
+<!-- BARRA FIXA DO TALKBACK -->
+<div class="talkback-bar">
+    <div class="tb-status">
+        <div class="tb-indicator active" id="tbIndicator"></div>
+        <span id="tbStatusText">TalkBack: Ativado</span>
+    </div>
+    <button class="tb-toggle-btn tb-target" id="tbToggleBtn" onclick="TalkBack.toggle()">Alternar Leitor (Alt+T)</button>
+</div>
+
+<script>
+    /* =========================================================
+       SISTEMA TALKBACK - LEITOR DE TELA INTEGRADO
+       ========================================================= */
+    const TalkBack = {
+        enabled: true,
+        focusedElement: null,
+        audioCtx: null,
+
+        init() {
+            document.addEventListener('focusin', (e) => this.handleFocus(e.target));
+            document.addEventListener('click', (e) => {
+                if (this.enabled && e.target.classList.contains('tb-target')) {
+                    this.playAudioFeedback('click');
+                }
+            }, true);
+
+            // Atalho de teclado para alternar leitor (Alt+T)
+            document.addEventListener('keydown', (e) => {
+                if (e.altKey && (e.key === 't' || e.key === 'T')) {
+                    e.preventDefault();
+                    this.toggle();
+                }
+            });
+
+            // Mapeia todos os elementos focáveis como alvos do TalkBack
+            document.querySelectorAll('button, input, textarea, a, [tabindex="0"]').forEach(el => {
+                el.classList.add('tb-target');
+            });
+
+            setTimeout(() => {
+                if (this.enabled) {
+                    this.speak("TalkBack ativado. Inclusitec. Dê um toque em qualquer item para ouvir.");
+                }
+            }, 800);
+        },
+
+        toggle() {
+            this.enabled = !this.enabled;
+            const indicator = document.getElementById('tbIndicator');
+            const statusText = document.getElementById('tbStatusText');
+            
+            if (this.enabled) {
+                document.body.classList.add('talkback-active');
+                indicator.classList.add('active');
+                statusText.innerText = "TalkBack: Ativado";
+                this.playAudioFeedback('enable');
+                this.speak("TalkBack ativado.");
+            } else {
+                document.body.classList.remove('talkback-active');
+                indicator.classList.remove('active');
+                statusText.innerText = "TalkBack: Desativado";
+                this.playAudioFeedback('disable');
+                this.speak("TalkBack desativado.");
+            }
+        },
+
+        handleFocus(element) {
+            if (!this.enabled || !element) return;
+
+            if (this.focusedElement) {
+                this.focusedElement.classList.remove('tb-focused');
+            }
+
+            this.focusedElement = element;
+            this.focusedElement.classList.add('tb-focused');
+            
+            this.playAudioFeedback('focus');
+
+            const label = this.getElementDescription(element);
+            this.speak(label);
+
+            document.getElementById('tbStatusText').innerText = label.substring(0, 35) + (label.length > 35 ? '...' : '');
+        },
+
+        getElementDescription(el) {
+            if (el.dataset && el.dataset.tbLabel) {
+                let status = el.classList.contains('active') ? 'Ativado' : 'Desativado';
+                return `${el.dataset.tbLabel}, ${status}. Toque para alterar.`;
+            }
+
+            let role = (el.dataset && el.dataset.tbRole) || '';
+            if (!role) {
+                const tag = el.tagName.toLowerCase();
+                if (tag === 'button') role = 'Botão';
+                else if (tag === 'textarea') role = 'Caixa de texto';
+                else if (tag === 'input') role = 'Campo de entrada';
+                else if (tag === 'h1' || tag === 'h2') role = 'Título';
+                else role = 'Texto';
+            }
+
+            let text = el.innerText || el.placeholder || el.value || el.getAttribute('aria-label') || '';
+            text = text.trim();
+
+            if (el.tagName.toLowerCase() === 'textarea' && !text) {
+                text = "Caixa de texto vazia. Digite aqui para traduzir em Braille.";
+            }
+
+            return `${text}. ${role}`;
+        },
+
+        speak(text) {
+            if (!('speechSynthesis' in window) || !text) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        },
+
+        playAudioFeedback(type) {
+            try {
+                if (!this.audioCtx) {
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(this.audioCtx.destination);
+
+                const now = this.audioCtx.currentTime;
+
+                if (type === 'focus') {
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'click') {
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'enable') {
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'disable') {
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                }
+            } catch (e) {}
+        }
+    };
+
+    /* =========================================================
+       RECURSOS E LÓGICA DO INCLUSITEC
+       ========================================================= */
+
+    // Mapeamento para caracteres Unicode Braille (U+2800..U+28FF)
+    const brailleMap = {
+        'a': '⠁', 'b': '⠃', 'c': '⠉', 'd': '⠙', 'e': '⠑', 'f': '⠋', 'g': '⠛', 'h': '⠓', 'i': '⠊', 'j': '⠚',
+        'k': '⠅', 'l': '⠇', 'm': '⠍', 'n': '⠝', 'o': '⠕', 'p': '⠏', 'q': '⠟', 'r': '⠗', 's': '⠎', 't': '⠞',
+        'u': '⠥', 'v': '⠧', 'w': '⠺', 'x': '⠭', 'y': '⠽', 'z': '⠵',
+        'á': '⠷', 'à': '⠢', 'â': '⠮', 'ã': '⠯', 'é': '⠿', 'ê': '⠮', 'í': '⠌', 'ó': '⠹', 'ô': '⠾', 'õ': '⠻', 'ú': 'fact', 'ç': '⠯',
+        '0': '⠚', '1': '⠁', '2': '⠃', '3': '⠉', '4': '⠙', '5': '⠑', '6': '⠋', '7': '⠛', '8': '⠓', '9': '⠊',
+        ' ': '⠀', '.': '⠲', ',': '⠂', '!': '⠔', '?': '⠢', '-': '⠤'
+    };
+
+    const reverseBrailleMap = {};
+    for (let key in brailleMap) {
+        if (!reverseBrailleMap[brailleMap[key]] && key >= 'a' && key <= 'z') {
+            reverseBrailleMap[brailleMap[key]] = key;
+        }
     }
 
-    // Auto Contraste
     function toggleContrast() {
-      const isContrast = document.body.classList.toggle('high-contrast');
-      const msg = isContrast ? "Modo de alto contraste ativado" : "Modo de alto contraste desativado";
-      falar(msg);
+        document.body.classList.toggle('high-contrast');
+        const isHigh = document.body.classList.contains('high-contrast');
+        TalkBack.speak(isHigh ? "Modo de alto contraste ativado." : "Modo de alto contraste desativado.");
     }
 
-    // Mapa Braille simples
-    const mapBraille = {
-      'a':'⠁', 'b':'⠃', 'c':'⠉', 'd':'⠙', 'e':'⠑', 'f':'⠋', 'g':'⠛', 'h':'⠃', 'i':'⠊', 'j':'⠚',
-      'k':'⠅', 'l':'⠇', 'm':'⠍', 'n':'⠝', 'o':'⠕', 'p':'⠏', 'q':'⠟', 'r':'⠗', 's':'⠎', 't':'⠞',
-      'u':'⠥', 'v':'⠧', 'w':'⠺', 'x':'⠭', 'y':'⠽', 'z':'⠵', ' ': ' '
-    };
-
-    function traduzirTexto() {
-      const input = document.getElementById('txtInput').value.toLowerCase();
-      let res = '';
-      for (let char of input) {
-        res += mapBraille[char] || char;
-      }
-      document.getElementById('brailleResult').innerText = res;
-    }
-
-    // Câmera & Reconhecimento de Voz "Tirar Foto"
-    let streamRef = null;
-    let traducaoSimulada = "";
-
-    async function abrirCamera() {
-      const area = document.getElementById('cameraArea');
-      area.classList.remove('hidden');
-      falar("Câmera aberta. Aponte para o texto em braille e diga tirar foto.");
-
-      try {
-        streamRef = await navigator.mediaDevices.getUserMedia({ video: true });
-        document.getElementById('videoFeed').srcObject = streamRef;
-        iniciarEscutaVoz();
-      } catch (e) {
-        alert("Não foi possível acessar a câmera.");
-      }
-    }
-
-    function iniciarEscutaVoz() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) return;
-
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'pt-BR';
-      recognition.continuous = true;
-
-      recognition.onresult = (event) => {
-        const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-        if (transcript.includes("tirar foto")) {
-          recognition.stop();
-          capturarFoto();
+    function translateToBraille() {
+        const input = document.getElementById('textInput').value.toLowerCase();
+        let result = '';
+        for (let char of input) {
+            result += brailleMap[char] || char;
         }
-      };
-      recognition.start();
+        document.getElementById('brailleResult').innerText = result;
     }
 
-    function capturarFoto() {
-      if (streamRef) {
-        streamRef.getTracks().forEach(track => track.stop());
-      }
-      document.getElementById('cameraArea').classList.add('hidden');
-      traducaoSimulada = "Texto Braille traduzido: Bem-vindo ao InclusiTec!";
-      document.getElementById('btnOuvirTraducao').disabled = false;
-      falar("Foto tirada com sucesso. Tradução concluída.");
+    function speakText(text) {
+        TalkBack.speak(text);
     }
 
-    function fotoSelecionada() {
-      traducaoSimulada = "Texto da foto selecionada: Acessibilidade e Inclusão.";
-      document.getElementById('btnOuvirTraducao').disabled = false;
-      falar("Foto selecionada. Tradução pronta.");
-    }
-
-    function ouvirTraducaoImagem() {
-      falar(traducaoSimulada);
-    }
-
-    // Cela Braille Interativa
+    // Controle da Cela Braille Interativa
     const activeDots = new Set();
-    const mapDotsToChar = {
-      '1': 'A', '1,2': 'B', '1,4': 'C', '1,4,5': 'D', '1,5': 'E',
-      '1,2,4': 'F', '1,2,4,5': 'G', '1,2,5': 'H', '2,4': 'I', '2,4,5': 'J',
-      '1,3': 'K', '1,2,3': 'L', '1,3,4': 'M', '1,3,4,5': 'N', '1,3,5': 'O',
-      '1,2,3,4': 'P', '1,2,3,4,5': 'Q', '1,2,3,5': 'R', '2,3,4': 'S', '2,3,4,5': 'T',
-      '1,3,6': 'U', '1,2,3,6': 'V', '2,4,5,6': 'W', '1,3,4,6': 'X', '1,3,4,5,6': 'Y', '1,3,5,6': 'Z'
-    };
 
-    function toggleDot(num) {
-      const btns = document.querySelectorAll('.dot-btn');
-      btns.forEach(btn => {
-        if (btn.innerText == num) {
-          btn.classList.toggle('active');
+    function toggleDot(dotNum) {
+        const btn = document.getElementById('dot' + dotNum);
+        if (activeDots.has(dotNum)) {
+            activeDots.delete(dotNum);
+            btn.classList.remove('active');
+            btn.setAttribute('aria-pressed', 'false');
+        } else {
+            activeDots.add(dotNum);
+            btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
         }
-      });
 
-      if (activeDots.has(num)) {
-        activeDots.delete(num);
-      } else {
-        activeDots.add(num);
-      }
+        // Cálculo da posição Unicode Braille
+        let code = 0x2800;
+        if (activeDots.has(1)) code += 0x01;
+        if (activeDots.has(2)) code += 0x02;
+        if (activeDots.has(3)) code += 0x04;
+        if (activeDots.has(4)) code += 0x08;
+        if (activeDots.has(5)) code += 0x10;
+        if (activeDots.has(6)) code += 0x20;
 
-      const key = Array.from(activeDots).sort().join(',');
-      const letra = mapDotsToChar[key] || '?';
-      document.getElementById('celaResultado').innerText = letra;
+        const brailleChar = String.fromCharCode(code);
+        const letter = reverseBrailleMap[brailleChar] || "combinação personalizada";
 
-      if (letra !== '?') {
-        falar("Letra " + letra);
-      } else {
-        falar("Ponto " + num);
-      }
+        TalkBack.speak(`Ponto ${dotNum} ${activeDots.has(dotNum) ? 'ativado' : 'desativado'}. Padrão atual: ${letter.toUpperCase()}`);
     }
 
-    // Tabela Expandível
-    function toggleTabela() {
-      const tab = document.getElementById('tabelaBraille');
-      tab.classList.toggle('hidden');
-      falar(tab.classList.contains('hidden') ? "Tabela fechada" : "Tabela de Braille expandida");
+    function handleCellKeyDown(e) {
+        if (e.key >= '1' && e.key <= '6') {
+            toggleDot(parseInt(e.key));
+        }
     }
 
-    // Descrição Visual da Página
-    let lendoDescricao = false;
-    const textoDescricaoVisual = "A página possui um topo com o texto InclusiTec em Braille e em português. Possui um fundo escuro com efeito tridimensional em tons de azul neon e bordas em azul bic. Contém o símbolo internacional de acessibilidade, botões de comando para alto contraste, captura de câmera por voz, leitura de arquivos de foto, tradutor direto de texto digitado em Braille, cela interativa com feedback de áudio, tabela de aprendizado e link para a loja.";
-
-    function toggleDescricaoVisual() {
-      if (!lendoDescricao) {
-        lendoDescricao = true;
-        falar(textoDescricaoVisual);
-      } else {
-        desativarDescricao();
-      }
+    function toggleLearnTable() {
+        const table = document.getElementById('learnTable');
+        if (table.style.display === 'block') {
+            table.style.display = 'none';
+            TalkBack.speak("Tabela de aprendizado oculta.");
+        } else {
+            table.style.display = 'block';
+            if (!table.innerHTML) {
+                let html = '';
+                for (let i = 97; i <= 122; i++) {
+                    const char = String.fromCharCode(i);
+                    const bChar = brailleMap[char] || '';
+                    html += `<div class="learn-row tb-target" tabindex="0" onclick="TalkBack.speak('Letra ${char.toUpperCase()} em Braille é ${bChar}')">
+                        <span>Letra ${char.toUpperCase()}</span>
+                        <span style="font-size:1.5rem;">${bChar}</span>
+                    </div>`;
+                }
+                table.innerHTML = html;
+                table.querySelectorAll('.tb-target').forEach(el => {
+                    el.addEventListener('focus', () => TalkBack.handleFocus(el));
+                });
+            }
+            TalkBack.speak("Tabela de aprendizado em Braille exibida.");
+        }
     }
 
-    function desativarDescricao() {
-      if (lendoDescricao) {
-        window.speechSynthesis.cancel();
-        lendoDescricao = false;
-      }
+    function startVoiceCamera() {
+        TalkBack.speak("Iniciando câmera. Por favor, autorize o acesso se solicitado.");
+        const video = document.getElementById('videoFeed');
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    video.style.display = 'block';
+                    video.srcObject = stream;
+                    TalkBack.speak("Câmera ativada com sucesso.");
+                })
+                .catch(() => {
+                    TalkBack.speak("Não foi possível acessar a câmera do dispositivo.");
+                });
+        } else {
+            TalkBack.speak("Recurso de câmera não suportado neste navegador.");
+        }
     }
 
-    // Interromper descrição ao apertar Enter novamente
-    document.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        desativarDescricao();
-      }
+    function handleFile(input) {
+        if (input.files && input.files[0]) {
+            TalkBack.speak(`Arquivo ${input.files[0].name} selecionado. Processando imagem...`);
+            setTimeout(() => {
+                const simulatedText = "Inclusão e Acessibilidade para Todos";
+                document.getElementById('textInput').value = simulatedText;
+                translateToBraille();
+                TalkBack.speak(`Texto lido da imagem: ${simulatedText}`);
+            }, 1200);
+        }
+    }
+
+    function describePage() {
+        const desc = "A página do Inclusitec inclui: botão para alto contraste, leitor de tela TalkBack integrado, leitor por câmera, seletor de mídias, tradutor direto de texto para Braille, cela interativa com síntese de voz e tabela educativa de caracteres Braille.";
+        TalkBack.speak(desc);
+    }
+
+    //                      Inicialização ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+        TalkBack.init();
     });
-  </script>
+</script>
 </body>
 </html>
