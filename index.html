@@ -914,11 +914,49 @@
         };
     }
 
+    // ============================================================
+    // ENDEREÇO DA API (funciona em localhost, IP local, túnel e Vercel)
+    // ============================================================
+    let apiBase = null; // '' = mesma origem (recomendado em túnel/localhost)
+
+    function apiCandidates() {
+        const list = [];
+        // Página servida pelo Flask (localhost, IP da rede, dev tunnel, ngrok...)
+        // -> usa a MESMA origem, evitando bloqueio de mixed content (https -> http)
+        if (location.protocol !== 'file:') list.push('');
+        // Fallback: backend rodando na máquina local
+        list.push('http://localhost:5000');
+        return list;
+    }
+
+    async function probeBase(base) {
+        try {
+            const response = await fetch(base + '/api/health', { cache: 'no-store' });
+            if (!response.ok) return false;
+            const result = await response.json();
+            return result && result.status === 'ok';
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async function resolveApiBase() {
+        if (apiBase !== null && await probeBase(apiBase)) return apiBase;
+        for (const base of apiCandidates()) {
+            if (base === apiBase) continue;
+            if (await probeBase(base)) {
+                apiBase = base;
+                return base;
+            }
+        }
+        return apiBase;
+    }
+
     async function sendImageToBackend(canvas) {
         try {
             const imageData = canvas.toDataURL('image/jpeg', 0.8);
-            
-            const response = await fetch('http://localhost:5000/api/detect-braille', {
+            const base = (await resolveApiBase()) || '';
+            const response = await fetch(base + '/api/detect-braille', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -998,13 +1036,16 @@
     }
 
     async function checkBackendStatus() {
-        try {
-            const response = await fetch('http://localhost:5000/api/health');
-            const result = await response.json();
-            return result.status === 'ok';
-        } catch (error) {
-            return false;
+        const base = await resolveApiBase();
+        if (base !== null && await probeBase(base)) return true;
+        // Última tentativa: varre todas as opções de endereço
+        for (const candidate of apiCandidates()) {
+            if (await probeBase(candidate)) {
+                apiBase = candidate;
+                return true;
+            }
         }
+        return false;
     }
 
     async function updateBackendIndicator() {
