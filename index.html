@@ -244,6 +244,72 @@
             margin-bottom: 8px;
             font-weight: bold;
         }
+
+        .doc-hint {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin: 6px 0 0 0;
+            line-height: 1.5;
+        }
+
+        #docStatus {
+            min-height: 1.4em;
+            margin: 6px 0;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        /* Folha de impressão em Braille (só aparece ao imprimir) */
+        #printSheet {
+            display: none;
+        }
+
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        @media print {
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+            }
+            body * {
+                visibility: hidden !important;
+            }
+            #printSheet,
+            #printSheet * {
+                visibility: visible !important;
+            }
+            #printSheet {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: #fff;
+                color: #000;
+                font-size: 22pt;
+                line-height: 1.5;
+            }
+            .print-title {
+                font-size: 14pt;
+                font-weight: bold;
+                margin-bottom: 8mm;
+                word-break: break-word;
+            }
+            .print-line {
+                font-size: 18pt;
+                line-height: 1.5;
+                white-space: pre-wrap;
+                word-break: break-all;
+                font-family: 'Segoe UI Symbol', 'Arial Unicode MS', 'DejaVu Sans', 'Courier New', monospace;
+            }
+            .print-footer {
+                font-size: 10pt;
+                margin-top: 10mm;
+            }
+        }
     </style>
 </head>
 <body class="talkback-active">
@@ -279,6 +345,19 @@
 
     <div class="spacer"></div>
 
+    <!-- Conversão de documentos (PDF/DOCX) para impressão em Braille -->
+    <label class="tb-target" tabindex="0" id="docLabel">Converter um documento (PDF ou DOCX) para impressão em Braille:</label>
+    <button class="btn tb-target" onclick="document.getElementById('docInput').click()">Converter PDF ou DOCX para Braille</button>
+    <input type="file" id="docInput" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="handleDocument(this)">
+    <p id="docStatus" class="tb-target" tabindex="0" aria-live="polite"></p>
+    <button class="btn tb-target" id="printBtn" style="display:none" onclick="printBraille()">Imprimir documento em Braille (escolher impressora)</button>
+    <p class="doc-hint tb-target" tabindex="0">
+        O botão <strong>Imprimir</strong> abre a impressão do celular ou do computador: escolha a impressora conectada
+        (Wi-Fi, Bluetooth ou cabo) e confirme. Se preferir, selecione "Salvar como PDF" para guardar o arquivo em Braille.
+    </p>
+
+    <div class="spacer"></div>
+
     <div style="text-align: center;">
         <label class="tb-target" tabindex="0" id="cellLabel">Cela Braille Interativa (Alterne os pontos para ouvir a letra):</label>
         <br>
@@ -304,6 +383,9 @@
 </div>
 <br>
 
+<!-- Folha que será impressa com o conteúdo em Braille -->
+<div id="printSheet" aria-hidden="true"></div>
+
 <div class="talkback-bar">
     <div class="tb-status">
         <div class="tb-indicator active" id="tbIndicator"></div>
@@ -311,6 +393,10 @@
     </div>
     <button class="tb-toggle-btn tb-target" id="tbToggleBtn" onclick="TalkBack.toggle()">Alternar Leitor (Alt+T)</button>
 </div>
+
+<!-- Bibliotecas de conversão de documentos (PDF e DOCX) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <script>
     const TalkBack = {
@@ -467,7 +553,8 @@
         'u': '⠥', 'v': '⠧', 'w': '⠺', 'x': '⠭', 'y': '⠽', 'z': '⠵',
         'á': '⠿', 'à': '⠷', 'â': '⠱', 'ã': '⠯', 'é': '⠮', 'ê': '⠣', 'í': '⠌', 'ó': '⠹', 'ô': '⠪', 'õ': '⠻', 'ú': '⠥', 'ç': '⠯',
         '0': '⠚', '1': '⠁', '2': '⠃', '3': '⠉', '4': '⠙', '5': '⠑', '6': '⠋', '7': '⠛', '8': '⠓', '9': '⠊',
-        ' ': '⠀', '.': '⠲', ',': '⠂', '!': '⠔', '?': '⠢', '-': '⠤'
+        ' ': '⠀', '.': '⠲', ',': '⠂', '!': '⠔', '?': '⠢', '-': '⠤',
+        ':': '⠒', ';': '⠆', '(': '⠪', ')': '⠜', '/': '⠌', '–': '⠤', '—': '⠤'
     };
 
     const reverseBrailleMap = {};
@@ -490,6 +577,212 @@
             result += brailleMap[char] || char;
         }
         document.getElementById('brailleResult').innerText = result;
+    }
+
+    // ============================================================
+    // CONVERSÃO DE DOCUMENTOS (PDF/DOCX) -> BRAILLE PARA IMPRESSÃO
+    // ============================================================
+
+    const BRAILLE_BLANK = '⠀';
+    const BRAILLE_NUMBER_IND = '⠼'; // indicador de número
+    const BRAILLE_CAPITAL_IND = '⠠'; // indicador de maiúscula
+    const CELLS_PER_LINE = 40; // linhas padrão de uma folha Braille (A4)
+    let currentBrailleDoc = null;
+
+    /** Converte texto comum em Braille (com indicadores de número e maiúscula). */
+    function textToBraille(text) {
+        let out = '';
+        let inNumber = false;
+
+        for (const ch of text) {
+            if (ch >= '0' && ch <= '9') {
+                if (!inNumber) out += BRAILLE_NUMBER_IND;
+                out += brailleMap[ch];
+                inNumber = true;
+                continue;
+            }
+            inNumber = false;
+
+            if (ch >= 'A' && ch <= 'Z') {
+                out += BRAILLE_CAPITAL_IND + (brailleMap[ch.toLowerCase()] || ch.toLowerCase());
+                continue;
+            }
+
+            if (ch === '\n' || ch === '\t') {
+                out += '\n';
+                continue;
+            }
+
+            if (ch === ' ' && out.endsWith('\n')) continue; // evita espaço no início da linha
+            out += brailleMap[ch] ?? brailleMap[ch.toLowerCase()] ?? ch;
+        }
+
+        return out;
+    }
+
+    /** Quebra o texto Braille em linhas com no máximo `max` células. */
+    function wrapBrailleLines(text, max) {
+        const lines = [];
+        for (const paragraph of String(text).split('\n')) {
+            let line = '';
+            for (const cell of paragraph) {
+                line += cell;
+                if (line.length >= max) {
+                    lines.push(line);
+                    line = '';
+                }
+            }
+            lines.push(line);
+        }
+        return lines;
+    }
+
+    /** Extrai o texto de um arquivo PDF (usa pdf.js). */
+    async function extractPdfText(file) {
+        if (!window.pdfjsLib) {
+            throw new Error('Biblioteca de PDF não carregada. Verifique sua conexão com a internet.');
+        }
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const data = new Uint8Array(await file.arrayBuffer());
+        const pdf = await pdfjsLib.getDocument({ data }).promise;
+        const pages = [];
+
+        for (let p = 1; p <= pdf.numPages; p++) {
+            const page = await pdf.getPage(p);
+            const content = await page.getTextContent();
+            let line = '';
+            let prevRight = null;
+
+            for (const item of content.items) {
+                if (typeof item.str !== 'string') continue;
+                const x = item.transform ? item.transform[4] : null;
+                const width = item.width || 0;
+
+                // Insere espaço quando há separação horizontal entre trechos
+                if (prevRight !== null && x !== null && line && !/\s$/.test(line) && item.str && !/^\s/.test(item.str)) {
+                    if (x - prevRight > 1) line += ' ';
+                }
+
+                line += item.str;
+                prevRight = x !== null ? x + width : null;
+
+                if (item.hasEOL) {
+                    pages.push(line);
+                    line = '';
+                    prevRight = null;
+                }
+            }
+            if (line) pages.push(line);
+            pages.push(''); // quebra entre páginas
+        }
+
+        return pages.join('\n').replace(/\n{3,}/g, '\n\n');
+    }
+
+    /** Extrai o texto de um arquivo DOCX (document.xml dentro do pacote Office). */
+    async function extractDocxText(file) {
+        if (!window.JSZip) {
+            throw new Error('Biblioteca de DOCX não carregada. Verifique sua conexão com a internet.');
+        }
+        const zip = await JSZip.loadAsync(await file.arrayBuffer());
+        const entry = zip.file('word/document.xml');
+        if (!entry) throw new Error('Arquivo DOCX inválido (word/document.xml não encontrado).');
+
+        const xml = await entry.async('string');
+        const doc = new DOMParser().parseFromString(xml, 'application/xml');
+        const paragraphs = doc.getElementsByTagName('w:p');
+        const lines = [];
+
+        for (const p of paragraphs) {
+            let line = '';
+            const runs = p.getElementsByTagName('w:t');
+            for (const run of runs) line += run.textContent;
+            lines.push(line);
+        }
+
+        return lines.join('\n');
+    }
+
+    /** Monta a folha que será enviada para a impressora. */
+    function buildPrintSheet(fileName, brailleText) {
+        const sheet = document.getElementById('printSheet');
+        sheet.innerHTML = '';
+
+        const title = document.createElement('div');
+        title.className = 'print-title';
+        title.textContent = fileName + ' — Convertido para Braille pelo Inclusitec';
+        sheet.appendChild(title);
+
+        for (const line of wrapBrailleLines(brailleText, CELLS_PER_LINE)) {
+            const div = document.createElement('div');
+            div.className = 'print-line';
+            div.textContent = line || BRAILLE_BLANK;
+            sheet.appendChild(div);
+        }
+
+        const footer = document.createElement('div');
+        footer.className = 'print-footer';
+        footer.textContent = 'Inclusitec — impressão em Braille — ' + new Date().toLocaleDateString('pt-BR');
+        sheet.appendChild(footer);
+    }
+
+    /** Função principal: recebe o PDF/DOCX, converte e libera o botão Imprimir. */
+    async function handleDocument(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+
+        const status = document.getElementById('docStatus');
+        const printBtn = document.getElementById('printBtn');
+        printBtn.style.display = 'none';
+        currentBrailleDoc = null;
+
+        const ext = (file.name.split('.').pop() || '').toLowerCase();
+        status.innerText = `Convertendo "${file.name}" para Braille...`;
+        TalkBack.speak(`Convertendo o arquivo ${file.name} para Braille. Aguarde.`);
+
+        try {
+            let text = '';
+            if (ext === 'pdf') {
+                text = await extractPdfText(file);
+            } else if (ext === 'docx') {
+                text = await extractDocxText(file);
+            } else {
+                throw new Error('Formato não suportado. Envie um arquivo PDF ou DOCX.');
+            }
+
+            text = String(text || '').replace(/\r/g, '').replace(/[ \t]+\n/g, '\n').trim();
+            if (!text) throw new Error('Nenhum texto encontrado dentro do arquivo.');
+
+            const braille = textToBraille(text);
+
+            document.getElementById('textInput').value = text;
+            document.getElementById('brailleResult').innerText = braille;
+            buildPrintSheet(file.name, braille);
+
+            currentBrailleDoc = { name: file.name, text: text, braille: braille };
+            printBtn.style.display = 'block';
+
+            const chars = text.length;
+            status.innerText = `Arquivo "${file.name}" convertido com sucesso! ${chars} caracteres em Braille. Toque em "Imprimir documento em Braille" para escolher a impressora.`;
+            TalkBack.speak(`Arquivo ${file.name} convertido com sucesso para Braille. Botão Imprimir disponível abaixo do resultado.`);
+        } catch (err) {
+            status.innerText = 'Erro na conversão: ' + (err && err.message ? err.message : err);
+            TalkBack.speak('Erro na conversão do documento: ' + (err && err.message ? err.message : err));
+        } finally {
+            input.value = '';
+        }
+    }
+
+    /** Abre a janela de impressão do celular/computador para escolher a impressora. */
+    function printBraille() {
+        if (!currentBrailleDoc) {
+            TalkBack.speak('Nenhum documento convertido ainda. Converta um PDF ou DOCX primeiro.');
+            return;
+        }
+        TalkBack.speak('Abrindo a impressão do dispositivo. Selecione a impressora conectada e confirme.');
+        setTimeout(() => window.print(), 400);
     }
 
     function speakRoboticText(text) {

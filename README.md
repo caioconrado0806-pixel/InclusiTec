@@ -9,6 +9,9 @@ Sistema de detecção de Braille em imagens usando Inteligência Artificial (YOL
 - **Interface Acessível**: Mantém o frontend existente com suporte a TalkBack e alto contraste
 - **Câmera em Tempo Real**: Captura imagens da câmera para detecção instantânea
 - **Upload de Imagens**: Permite selecionar arquivos de imagem para análise
+- **Conversor de Documentos**: Botão que converte arquivos **PDF** e **DOCX** em texto Braille pronto para impressão
+- **Impressão em Braille**: Após a conversão, aparece o botão **Imprimir**, que abre a impressão do celular ou do
+  computador para enviar o documento à impressora conectada (Wi-Fi, Bluetooth ou cabo) ou salvar como PDF
 
 ## Requisitos
 
