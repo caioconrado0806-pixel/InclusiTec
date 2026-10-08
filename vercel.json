@@ -1,23 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "transformando vidas.html",
-      "use": "@vercel/static"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "app.py": {
+      "excludeFiles": "{assets/**,desktop/**,scripts/**,tests/**,data/**,.git/**,**/__pycache__/**,**/*.pyc,*.pt,*.pth,*.onnx,folha_braille_inclusitec.png,install.bat,README.md}"
     }
-  ],
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/transformando-vidas",
-      "dest": "/transformando vidas.html"
-    }
-  ]
+  }
 }

@@ -12,10 +12,13 @@ echo ============================================
 echo   Instalacao concluida!
 echo ============================================
 echo.
-echo Para iniciar o servidor, execute:
+echo Para iniciar o servidor (backend + frontend web):
 echo   python app.py
 echo.
 echo Depois abra no navegador:
 echo   http://localhost:5000
+echo.
+echo Para iniciar o cliente desktop (frontend Python):
+echo   python desktop\client.py
 echo.
 pause

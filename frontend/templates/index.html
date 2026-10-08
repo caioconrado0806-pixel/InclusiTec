@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inclusitec - Leitor de Braille</title>
+    <link rel="manifest" href="data:application/manifest+json,{
+        %22name%22:%22Inclusitec%22,
+        %22short_name%22:%22Inclusitec%22,
+        %22start_url%22:%22/%22,
+        %22display%22:%22standalone%22,
+        %22background_color%22:%22%23000511%22,
+        %22theme_color%22:%22%2300f3ff%22
+    }">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="container" id="mainContainer">
+    <h1>Inclusitec</h1>
+
+    <button class="btn" id="contrastBtn" onclick="toggleContrast()">Alto Contraste</button>
+
+    <p id="appDef">
+        <strong>O Inclusitec</strong> é uma plataforma acessível em 5D desenvolvida
+        para leitura, tradução e aprendizado interativo do sistema Braille,
+        promovendo inclusão visual por voz, toque e haptividade.
+    </p>
+
+    <!-- FORMULÁRIO DE CADASTRO -->
+    <div class="panel">
+        <h2>Cadastro de Usuário</h2>
+        <form id="cadastroForm" onsubmit="salvarCadastro(event)">
+            <label for="nome">Nome Completo:</label>
+            <input type="text" id="nome" required placeholder="Digite seu nome">
+
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" required placeholder="seuemail@exemplo.com">
+
+            <label for="telefone">Telefone / WhatsApp:</label>
+            <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
+
+            <label for="perfil">Perfil do Usuário:</label>
+            <select id="perfil" required>
+                <option value="Deficiente Visual">Deficiente Visual</option>
+                <option value="Educador/Professor">Educador / Professor</option>
+                <option value="Familiar/Acompanhante">Familiar / Acompanhante</option>
+                <option value="Outro">Outro</option>
+            </select>
+
+            <button type="submit" class="btn">Cadastrar e Enviar Dados</button>
+        </form>
+    </div>
+
+    <!-- LEITURA DE BRAILLE (CÂMERA / ARQUIVO) -->
+    <div class="panel">
+        <h2>Leitura de Braille</h2>
+
+        <button class="btn" onclick="startVoiceCamera()">Tirar Foto (Comando de Voz)</button>
+        <button class="btn" onclick="capturarFotoDireta()">Capturar Foto Agora</button>
+        <video id="videoFeed" autoplay playsinline></video>
+        <canvas id="photoCanvas"></canvas>
+
+        <button class="btn" onclick="document.getElementById('fileInput').click()">
+            Selecionar Arquivo de Mídia
+        </button>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this)">
+
+        <p id="detectStatus" class="status" aria-live="polite"></p>
+        <img id="annotatedImage" class="annotated" alt="Imagem com os pontos Braille detectados">
+        <div class="result-box">
+            <strong>Texto traduzido:</strong>
+            <div class="braille-output" id="detectResult">—</div>
+        </div>
+
+        <button class="btn" onclick="ouvirTraducao()">Ouvir Tradução</button>
+    </div>
+
+    <!-- CONVERSOR DE PDF PARA IMPRESSORA BRAILLE (BOTÃO NO MEIO DA PÁGINA) -->
+    <div class="panel panel-convert" id="pdfPanel">
+        <h2>PDF para Impressora Braille</h2>
+
+        <div class="convert-center">
+            <button class="btn btn-big" id="pdfConvertBtn" onclick="selecionarPdfBraille()">
+                📄 Converter PDF para Braille
+            </button>
+            <input type="file" id="pdfInput" accept="application/pdf,.pdf" style="display:none"
+                   onchange="converterPdfBraille(this)">
+            <p class="hint">
+                Escolha um arquivo <strong>.pdf</strong> — ele será convertido em arquivo
+                para impressora Braille (<strong>.brf</strong> / <strong>.brl</strong>).
+            </p>
+            <p id="pdfStatus" class="status" aria-live="polite"></p>
+        </div>
+
+        <!-- RESULTADO DA CONVERSÃO + IMPRESSÃO -->
+        <div class="pdf-result" id="pdfResult" style="display:none">
+            <div class="result-box">
+                <strong>Pré-visualização em Braille:</strong>
+                <div class="braille-output braille-preview" id="pdfBraillePreview"></div>
+            </div>
+
+            <p class="pdf-stats" id="pdfStats"></p>
+
+            <a class="btn btn-link" id="downloadBrf" href="#" download>Baixar arquivo .brf (impressora Braille)</a>
+            <a class="btn btn-link" id="downloadBrl" href="#" download>Baixar arquivo .brl (Braille Unicode)</a>
+
+            <div class="print-box" id="printBox" style="display:none">
+                <h3>Imprimir</h3>
+
+                <label for="printerSelect">Impressora conectada:</label>
+                <select id="printerSelect"></select>
+
+                <button class="btn btn-print" id="printBtn" onclick="imprimirBraille()">
+                    🖨️ Imprimir
+                </button>
+
+                <button class="btn btn-small" onclick="imprimirNoNavegador()">
+                    Imprimir pelo navegador (janela do sistema)
+                </button>
+
+                <p id="printStatus" class="status" aria-live="polite"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRADUÇÃO DE TEXTO PARA BRAILLE -->
+    <div class="panel">
+        <h2>Texto para Braille</h2>
+
+        <label for="textInput">Digite para traduzir em Braille:</label>
+        <textarea id="textInput" oninput="translateToBraille()" placeholder="Digite aqui..."></textarea>
+        <div class="braille-output" id="brailleResult"></div>
+    </div>
+
+    <!-- CÉLULA INTERATIVA -->
+    <div class="panel" style="text-align: center;">
+        <h2>Célula Braille Interativa</h2>
+        <label>Cela Braille Interativa (Pressione Enter para falar a letra):</label>
+        <div class="braille-cell" id="brailleCell" tabindex="0" onkeydown="handleCellKeyDown(event)">
+            <button class="dot" id="dot1" onclick="toggleDot(1)" aria-label="Ponto 1"></button>
+            <button class="dot" id="dot4" onclick="toggleDot(4)" aria-label="Ponto 4"></button>
+            <button class="dot" id="dot2" onclick="toggleDot(2)" aria-label="Ponto 2"></button>
+            <button class="dot" id="dot5" onclick="toggleDot(5)" aria-label="Ponto 5"></button>
+            <button class="dot" id="dot3" onclick="toggleDot(3)" aria-label="Ponto 3"></button>
+            <button class="dot" id="dot6" onclick="toggleDot(6)" aria-label="Ponto 6"></button>
+        </div>
+        <p id="cellOutput" class="status" aria-live="polite"></p>
+    </div>
+
+    <!-- APRENDIZADO -->
+    <div class="panel">
+        <h2>Aprender Braille</h2>
+
+        <button class="btn" onclick="toggleLearnTable()">Aprender Braille</button>
+        <div class="table-learn" id="learnTable"></div>
+
+        <button class="btn" onclick="window.open('https://www.youtube.com/results?search_query=como+aprender+braille', '_blank')">
+            Saiba Mais (Vídeo)
+        </button>
+
+        <button class="btn" onclick="describePage()">Ver Descrição Visual da Página</button>
+    </div>
+</div>
+
+<!-- Área impressa pelo navegador (some na tela, aparece na impressão) -->
+<div class="print-area" id="printArea" aria-hidden="true"></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

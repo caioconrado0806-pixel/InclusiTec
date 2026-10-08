@@ -1,5 +1,17 @@
 flask>=3.0.0
 flask-cors>=4.0.0
-opencv-python>=4.8.0
 numpy>=1.24.0
-ultralytics>=8.0.0
+# Headless: sem dependências de GUI (libGL), ideal para servidores
+# Linux (Vercel). As rotas usam apenas imdecode/imencode.
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0
+
+# Conversão PDF -> Braille (botão "Converter PDF para Braille")
+pypdf>=4.0.0
+
+# Impressão direta nas impressoras do Windows (lista e envio)
+pywin32>=306; sys_platform == "win32"
+
+# Cliente desktop (frontend em Python, pasta desktop/)
+requests>=2.31.0
+pyttsx3>=2.90
