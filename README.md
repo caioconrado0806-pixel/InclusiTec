@@ -21,6 +21,7 @@ português brasileiro. **Backend e frontend 100% em Python.**
 
 ## Funcionalidades
 
+<<<<<<< HEAD
 - **Detecção de Braille**: OpenCV (padrão) ou YOLO (opcional,
   coloque `braille_yolo.pt` na raiz)
 - **Conversão para PT-BR**: células Braille → texto brasileiro,
@@ -31,6 +32,16 @@ português brasileiro. **Backend e frontend 100% em Python.**
   e captura de câmera
 - **Cadastro de usuários**: API + persistência em
   JSON/CSV (abre no Excel)
+=======
+- **Detecção de Braille**: Usa YOLO (Ultralytics) ou OpenCV para detectar padrões de Braille em imagens
+- **Conversão para PT-BR**: Converte células Braille para texto em português brasileiro
+- **Interface Acessível**: Mantém o frontend existente com suporte a TalkBack e alto contraste
+- **Câmera em Tempo Real**: Captura imagens da câmera para detecção instantânea
+- **Upload de Imagens**: Permite selecionar arquivos de imagem para análise
+- **Conversor de Documentos**: Botão que converte arquivos **PDF** e **DOCX** em texto Braille pronto para impressão
+- **Impressão em Braille**: Após a conversão, aparece o botão **Imprimir**, que abre a impressão do celular ou do
+  computador para enviar o documento à impressora conectada (Wi-Fi, Bluetooth ou cabo) ou salvar como PDF
+>>>>>>> origin/main
 
 ## Requisitos
 
