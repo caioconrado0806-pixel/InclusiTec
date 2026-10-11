@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal FATEC Taquaritinga - Sistema Integrado</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #B22222;
+            --dark-red: #8B0000;
+            --accent-gold: #D4AF37;
+            --bg-dark: #0f111a;
+            --card-bg: rgba(255, 255, 255, 0.07);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --text-light: #f8f9fa;
+            --text-muted: #a0a5b5;
+            --glass-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            margin: 0;
+                padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fundo dinâmico com Marca d'água / Efeito de Fumaça Dinâmica */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70vw;
+            height: 70vw;
+            max-width: 800px;
+            max-height: 800px;
+            background: radial-gradient(circle, rgba(178, 34, 34, 0.15) 0%, rgba(15, 17, 26, 0.85) 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -2;
+            animation: pulseBg 10s infinite alternate;
+        }
+
+        /* GIF / Marca D'água Central FATEC */
+        .bg-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.04;
+            width: 500px;
+            pointer-events: none;
+            z-index: -1;
+            filter: drop-shadow(0 0 20px var(--primary-red));
+            animation: floatLogo 8s ease-in-out infinite;
+        }
+
+        @keyframes pulseBg {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes floatLogo {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+            50% { transform: translate(-50%, -50%) translateY(-20px); }
+        }
+
+        /* Header Moderno estilo Glassmorphism com efeito 3D */
+        header {
+            background: rgba(15, 17, 26, 0.75);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            color: white;
+            font-weight: 800;
+            font-size: 1.4rem;
+            padding: 6px 14px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(178, 34, 34, 0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            transform: perspective(500px) rotateY(-5deg);
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-text span {
+            color: var(--primary-red);
+            font-size: 0.85rem;
+            display: block;
+            font-weight: 400;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+
+        nav a:hover, nav a.active {
+            background: rgba(178, 34, 34, 0.2);
+            border-color: rgba(178, 34, 34, 0.5);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(178, 34, 34, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Container Principal */
+        .main-container {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Efeito de Vidro (Glassmorphism 3D) */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.8rem;
+            box-shadow: var(--glass-glow);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            transform-style: preserve-3d;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
+        }
+
+        /* Títulos de Seção */
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            border-bottom: 2px solid rgba(255,255,255,0.08);
+            padding-bottom: 0.6rem;
+        }
+
+        .section-title i {
+            color: var(--primary-red);
+        }
+
+        /* Grid Layout Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.8rem;
+        }
+
+        /* Cartões de Serviços (3D Shadow Hover) */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px) rotateX(2deg) rotateY(2deg);
+            border-color: var(--primary-red);
+            box-shadow: 0 12px 30px rgba(178, 34, 34, 0.25);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(178,34,34,0.3), rgba(139,0,0,0.6));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .feature-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+            line-height: 1.5;
+        }
+
+        /* Botões customizados */
+        .btn {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(178, 34, 34, 0.4);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 6px 20px rgba(178, 34, 34, 0.6);
+            transform: scale(1.02);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-light);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+        }
+
+        /* Tabela de Notas e Frequência */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-approved { background: rgba(40, 167, 69, 0.2); color: #2ecc71; border: 1px solid rgba(40, 167, 69, 0.4); }
+        .badge-warning { background: rgba(255, 193, 7, 0.2); color: #f1c40f; border: 1px solid rgba(255, 193, 7, 0.4); }
+
+        /* Modal Generico */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: #161925;
+            border: 1px solid var(--primary-red);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 550px;
+            box-shadow: 0 10px 40px rgba(178, 34, 34, 0.3);
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .modal-close:hover { color: #fff; }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 10px rgba(178, 34, 34, 0.5);
+        }
+
+        /* Buscador de Cursos */
+        .search-bar {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-bar input {
+            padding-left: 42px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 3rem;
+            background: rgba(10, 11, 18, 0.8);
+        }
+
+        /* Tab System */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Marca d'água FATEC -->
+    <svg class="bg-watermark" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#B22222" d="M40,20 L160,20 L160,50 L80,50 L80,80 L140,80 L140,110 L80,110 L80,180 L40,180 Z" />
+    </svg>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="logo-container" onclick="switchTab('dashboard')">
+            <div class="logo-badge">FATEC</div>
+            <div class="logo-text">
+                Taquaritinga
+                <span>Portal Acadêmico Integrado</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" class="nav-link active" onclick="switchTab('dashboard')"><i class="fa-solid fa-house"></i> Início</a></li>
+                <li><a href="#" class="nav-link" onclick="switchTab('aluno')"><i class="fa-solid fa-user-graduate"></i> Portal Aluno</a></li>
+                <li><a href="#" class="nav-link" onclick="switchTab('cursos')"><i class="fa-solid fa-book-open"></i> Cursos</a></li>
+                <li><a href="#" class="nav-link" onclick="switchTab('biblioteca')"><i class="fa-solid fa-file-pdf"></i> Biblioteca PDF</a></li>
+                <li><a href="#" class="nav-link" onclick="openModal('modalVestibular')"><i class="fa-solid fa-pen-to-square"></i> Vestibular</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-container">
+
+        <!-- TAB 1: DASHBOARD PRINCIPAL -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="glass-card">
+                <h2>Bem-vindo ao Portal FATEC Taquaritinga</h2>
+                <p style="color: var(--text-muted); margin-top: 5px;">Acesse todas as ferramentas acadêmicas, conexão Wi-Fi, consulta de notas e vagas de estágio em um único lugar.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Portal Aluno -->
+                <div class="feature-card" onclick="switchTab('aluno')">
+                    <div>
+                        <div class="feature-header">
+                            <div class="feature-icon"><i class="fa-solid fa-id-card"></i></div>
+                            <div class="feature-title">Portal do Aluno</div>
+                        </div>
+                        <div class="feature-desc">Consulte suas notas, faltas, histórico escolar e frequências em tempo real.</div>
+                    </div>
+                    <button class="btn btn-outline"><i class="fa-solid fa-arrow-right"></i> Acessar Notas</button>
+                </div>
+
+                <!-- Conexão Wi-Fi -->
+                <div class="feature-card" onclick="openModal('modalWifi')">
+                    <div>
+                        <div class="feature-header">
+                            <div class="feature-icon"><i class="fa-solid fa-wifi"></i></div>
+                            <div class="feature-title">Rede Wi-Fi FATEC</div>
+                        </div>
+                        <div class="feature-desc">Solicite acesso rápido e seguro à rede sem fio do campus para alunos e docentes.</div>
+                    </div>
+                    <button class="btn"><i class="fa-solid fa-key"></i> Conectar Wi-Fi</button>
+                </div>
+
+                <!-- Vestibular / Inscrição -->
+                <div class="feature-card" onclick="openModal('modalVestibular')">
+                    <div>
+                        <div class="feature-header">
+                            <div class="feature-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <div class="feature-title">Inscrição Vestibular</div>
+                        </div>
+                        <div class="feature-desc">Faça sua inscrição para os novos cursos de tecnologia da FATEC Taquaritinga.</div>
+                    </div>
+                    <button class="btn"><i class="fa-solid fa-pen-clip"></i> Inscrever-se</button>
+                </div>
+
+                <!-- Estágios & Carreira -->
+                <div class="feature-card" onclick="openModal('modalEstagios')">
+                    <div>
+                        <div class="feature-header">
+                            <div class="feature-icon"><i class="fa-solid fa-briefcase"></i></div>
+                            <div class="feature-title">Mural de Estágios</div>
+                        </div>
+                        <div class="feature-desc">Vagas de estágio e emprego disponíveis exclusivas para alunos FATEC.</div>
+                    </div>
+                    <button class="btn btn-outline"><i class="fa-solid fa-search"></i> Ver Vagas</button>
+                </div>
+
+                <!-- Cursos -->
+                <div class="feature-card" onclick="switchTab('cursos')">
+                    <div>
+                        <div class="feature-header">
+                            <div class="feature-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                            <div class="feature-title">Cursos Oferecidos</div>
+                        </div>
+                        <div class="feature-desc">Conheça a grade curricular dos cursos superiores de tecnologia.</div>
+                    </div>
+                    <button class="btn btn-outline"><i class="fa-solid fa-list"></i> Explorar Cursos</button>
+                </div>
+
+                <!-- Biblioteca PDF -->
+                <div class="feature-card" onclick="switchTab('biblioteca')">
+                    <div>
+                        <div class="feature-header">
+                            <div class="feature-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+                            <div class="feature-title">Biblioteca Digital PDF</div>
+                        </div>
+                        <div class="feature-desc">Acesse livros digitais, TCCs, e-books e apostilas oficiais do Centro Paula Souza.</div>
+                    </div>
+                    <button class="btn btn-outline"><i class="fa-solid fa-download"></i> Acessar Acervo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: PORTAL DO ALUNO / NOTAS -->
+        <div id="tab-aluno" class="tab-content">
+            <div class="glass-card">
+                <div class="section-title"><i class="fa-solid fa-user-graduate"></i> Boletim Acadêmico - Semestre Atual</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Disciplina</th>
+                                <th>Professor(a)</th>
+                                <th>Nota P1</th>
+                                <th>Nota P2</th>
+                                <th>Frequência</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Desenvolvimento Web III</td>
+                                <td>Prof. Ricardo</td>
+                                <td>8.5</td>
+                                <td>9.0</td>
+                                <td>92%</td>
+                                <td><span class="badge-status badge-approved">Aprovado</span></td>
+                            </tr>
+                            <tr>
+                                <td>Estrutura de Dados</td>
+                                <td>Prof. Alexandre</td>
+                                <td>7.0</td>
+                                <td>8.0</td>
+                                <td>88%</td>
+                                <td><span class="badge-status badge-approved">Aprovado</span></td>
+                            </tr>
+                            <tr>
+                                <td>Engenharia de Software</td>
+                                <td>Profa. Ana</td>
+                                <td>6.5</td>
+                                <td>--</td>
+                                <td>80%</td>
+                                <td><span class="badge-status badge-warning">Em Andamento</span></td>
+                            </tr>
+                            <tr>
+                                <td>Banco de Dados Relacional</td>
+                                <td>Prof. Carlos</td>
+                                <td>9.5</td>
+                                <td>9.0</td>
+                                <td>96%</td>
+                                <td><span class="badge-status badge-approved">Aprovado</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CURSOS E BUSCA -->
+        <div id="tab-cursos" class="tab-content">
+            <div class="glass-card">
+                <div class="section-title"><i class="fa-solid fa-graduation-cap"></i> Cursos Superiores de Tecnologia</div>
+                
+                <div class="search-bar">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="courseSearch" class="form-control" placeholder="Buscar curso por nome (ex: Análise, Agronegócio)..." onkeyup="filterCourses()">
+                </div>
+
+                <div class="dashboard-grid" id="courseList">
+                    <div class="feature-card course-item">
+                        <div class="feature-title" style="color: var(--primary-red); margin-bottom: 10px;">Análise e Desenvolvimento de Sistemas (ADS)</div>
+                        <p class="feature-desc">Formação completa para desenvolvimento de softwares, aplicações web, mobile e gestão de banco de dados.</p>
+                        <small style="color: var(--accent-gold);">Duração: 3 anos | Período: Tarde / Noite</small>
+                    </div>
+                    <div class="feature-card course-item">
+                        <div class="feature-title" style="color: var(--primary-red); margin-bottom: 10px;">Agronegócio</div>
+                        <p class="feature-desc">Gestão da cadeia produtiva agropecuária, inovação tecnológica no campo e exportação.</p>
+                        <small style="color: var(--accent-gold);">Duração: 3 anos | Período: Manhã / Noite</small>
+                    </div>
+                    <div class="feature-card course-item">
+                        <div class="feature-title" style="color: var(--primary-red); margin-bottom: 10px;">Sistemas para Internet</div>
+                        <p class="feature-desc">Foco em criação de portais, comércio eletrônico, UX/UI design e infraestrutura em nuvem.</p>
+                        <small style="color: var(--accent-gold);">Duração: 3 anos | Período: Noite</small>
+                    </div>
+                    <div class="feature-card course-item">
+                        <div class="feature-title" style="color: var(--primary-red); margin-bottom: 10px;">Produção Industrial</div>
+                        <p class="feature-desc">Otimização de processos produtivos, gestão da qualidade e manufatura avançada.</p>
+                        <small style="color: var(--accent-gold);">Duração: 3 anos | Período: Noite</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: BIBLIOTECA PDF -->
+        <div id="tab-biblioteca" class="tab-content">
+            <div class="glass-card">
+                <div class="section-title"><i class="fa-solid fa-file-pdf"></i> Acervo Digital & Repositório PDF</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Título do Material</th>
+                                <th>Categoria</th>
+                                <th>Ano</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Apostila Lógica de Programação com Python</td>
+                                <td>Material Didático</td>
+                                <td>2025</td>
+                                <td><a href="#" class="btn btn-outline" style="padding: 4px 12px; font-size: 0.8rem;"><i class="fa-solid fa-file-arrow-down"></i> Baixar PDF</a></td>
+                            </tr>
+                            <tr>
+                                <td>Manual de Trabalhos Acadêmicos (ABNT FATEC)</td>
+                                <td>Guia Acadêmico</td>
+                                <td>2026</td>
+                                <td><a href="#" class="btn btn-outline" style="padding: 4px 12px; font-size: 0.8rem;"><i class="fa-solid fa-file-arrow-down"></i> Baixar PDF</a></td>
+                            </tr>
+                            <tr>
+                                <td>Introdução à Engenharia de Software - E-Book</td>
+                                <td>E-book Oficial</td>
+                                <td>2024</td>
+                                <td><a href="#" class="btn btn-outline" style="padding: 4px 12px; font-size: 0.8rem;"><i class="fa-solid fa-file-arrow-down"></i> Baixar PDF</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL VESTIBULAR -->
+    <div class="modal-overlay" id="modalVestibular">
+        <div class="modal-box">
+            <span class="modal-close" onclick="closeModal('modalVestibular')">&times;</span>
+            <div class="section-title"><i class="fa-solid fa-pen-to-square"></i> Inscrição Vestibular 2026/2027</div>
+            <form onsubmit="handleFormSubmit(event, 'Inscrição realizada com sucesso!')">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" class="form-control" required placeholder="Digite seu nome">
+                </div>
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" class="form-control" required placeholder="000.000.000-00">
+                </div>
+                <div class="form-group">
+                    <label>Curso Pretendido</label>
+                    <select class="form-control">
+                        <option>Análise e Desenvolvimento de Sistemas</option>
+                        <option>Agronegócio</option>
+                        <option>Sistemas para Internet</option>
+                        <option>Produção Industrial</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width:100%; margin-top: 10px;">Enviar Inscrição</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL WIFI -->
+    <div class="modal-overlay" id="modalWifi">
+        <div class="modal-box">
+            <span class="modal-close" onclick="closeModal('modalWifi')">&times;</span>
+            <div class="section-title"><i class="fa-solid fa-wifi"></i> Credenciais de Acesso Wi-Fi</div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Utilize seu RA e senha do SIGA para autenticar na rede <strong>FATEC_ACADEMICO</strong>.</p>
+            <form onsubmit="handleFormSubmit(event, 'Dispositivo autenticado com sucesso no Wi-Fi!')">
+                <div class="form-group">
+                    <label>RA / Matrícula</label>
+                    <input type="text" class="form-control" placeholder="123456789" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn" style="width:100%;">Conectar à Rede</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL ESTÁGIOS -->
+    <div class="modal-overlay" id="modalEstagios">
+        <div class="modal-box">
+            <span class="modal-close" onclick="closeModal('modalEstagios')">&times;</span>
+            <div class="section-title"><i class="fa-solid fa-briefcase"></i> Oportunidades de Estágio</div>
+            <div style="display:flex; flex-direction:column; gap: 10px;">
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <strong style="color: var(--accent-gold);">Desenvolvedor Front-End Junior</strong>
+                    <p style="font-size:0.8rem; color: var(--text-muted);">Empresa TechTaquaritinga - Bolsa: R$ 1.500,00</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <strong style="color: var(--accent-gold);">Estágio em Gestão Agroindustrial</strong>
+                    <p style="font-size:0.8rem; color: var(--text-muted);">Usina Local - Bolsa: R$ 1.800,00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p><strong>FATEC Taquaritinga</strong> - Centro Paula Souza</p>
+        <p style="margin-top: 5px; opacity:0.6;">Portal desenvolvido com efeitos 3D, suporte a biblioteca PDF, vestibular e gestão de notas.</p>
+    </footer>
+
+    <script>
+        // Navegação entre Tabs
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+        }
+
+        // Sistema de Modais
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // Fechar modal clicando fora
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Filtro/Busca de Cursos
+        function filterCourses() {
+            let input = document.getElementById('courseSearch').value.toLowerCase();
+            let items = document.getElementsByClassName('course-item');
+
+            for (let i = 0; i < items.length; i++) {
+                let text = items[i].innerText.toLowerCase();
+                if (text.includes(input)) {
+                    items[i].style.display = "flex";
+                } else {
+                    items[i].style.display = "none";
+                }
+            }
+        }
+
+        // Handler de envio de formulários
+        function handleFormSubmit(e, message) {
+            e.preventDefault();
+            alert(message);
+            document.querySelectorAll('.modal-overlay').forEach(modal => modal.classList.remove('active'));
+        }
+    </script>
+</body>
+</html>

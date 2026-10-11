@@ -1,8 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/index.py": {
+    "api/*.py": {
       "excludeFiles": "{assets/**,desktop/**,scripts/**,tests/**,data/**,.git/**,**/__pycache__/**,**/*.pyc,*.pt,*.pth,*.onnx,folha_braille_inclusitec.png,install.bat,README.md}"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/probe/file", "destination": "/api/ping.py" },
+    { "source": "/probe/url", "destination": "/api/ping" },
+    { "source": "/(.*)", "destination": "/api/index.py" }
+  ]
 }
