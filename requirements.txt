@@ -12,6 +12,9 @@ pypdf>=4.0.0
 # Impressão direta nas impressoras do Windows (lista e envio)
 pywin32>=306; sys_platform == "win32"
 
+# WSGI server para Azure App Service (Linux)
+gunicorn>=21.2.0
+
 # Cliente desktop (frontend em Python, pasta desktop/)
 requests>=2.31.0
 pyttsx3>=2.90
