@@ -6,8 +6,6 @@
     }
   },
   "rewrites": [
-    { "source": "/probe/file", "destination": "/api/ping.py" },
-    { "source": "/probe/url", "destination": "/api/ping" },
     { "source": "/(.*)", "destination": "/api/index.py" }
   ]
 }
