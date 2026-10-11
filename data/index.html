@@ -1,0 +1,1146 @@
+    <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inclusitec - Leitor de Braille e Tela</title>
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Inclusitec%22,%22short_name%22:%22Inclusitec%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%23000511%22,%22theme_color%22:%22%2300f3ff%22}">
+    <style>
+        :root {
+            --bg-color: #030814;
+            --card-bg: rgba(0, 30, 60, 0.6);
+            --text-color: #00f3ff;
+            --accent-color: #00f3ff;
+            --border-glow: #00f3ff;
+            --shadow-5d: 0 20px 50px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.4);
+            --btn-bg: linear-gradient(145deg, #002244, #001122);
+            --talkback-focus: #00ff66;
+        }
+
+        .high-contrast {
+            --bg-color: #000000 !important;
+            --card-bg: #000000 !important;
+            --text-color: #ffff00 !important;
+            --accent-color: #ffff00 !important;
+            --border-glow: #ffff00 !important;
+            --shadow-5d: 0 0 25px #ffff00, inset 0 0 10px #ffff00 !important;
+            --btn-bg: #000000 !important;
+            --talkback-focus: #00ffff !important;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s ease;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            border: 2px solid var(--border-glow);
+            box-shadow: var(--shadow-5d);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .btn {
+            background: var(--btn-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-glow);
+            padding: 12px 24px;
+            margin: 8px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .btn:hover, .btn:focus {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 12px 25px var(--border-glow);
+        }
+
+        .talkback-active .tb-target:focus,
+        .talkback-active .tb-focused {
+            outline: 4px solid var(--talkback-focus) !important;
+            outline-offset: 4px !important;
+            box-shadow: 0 0 20px var(--talkback-focus), inset 0 0 10px var(--talkback-focus) !important;
+            border-radius: 8px;
+            animation: talkbackPulse 1.5s infinite alternate;
+        }
+
+        @keyframes talkbackPulse {
+            0% { outline-color: var(--talkback-focus); }
+            100% { outline-color: #ffffff; }
+        }
+
+        .talkback-bar {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 760px;
+            background: rgba(0, 15, 30, 0.95);
+            border: 2px solid var(--talkback-focus);
+            border-radius: 30px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0, 255, 102, 0.3);
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+
+        .tb-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--talkback-focus);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tb-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff3333;
+            box-shadow: 0 0 8px #ff3333;
+        }
+
+        .tb-indicator.active {
+            background-color: #00ff66;
+            box-shadow: 0 0 8px #00ff66;
+        }
+
+        .tb-toggle-btn {
+            background: #00ff66;
+            color: #000;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tb-toggle-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .spacer { height: 20px; }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-color);
+            border: 2px solid var(--border-glow);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 1.2rem;
+            box-sizing: border-box;
+            box-shadow: inset 0 0 10px var(--border-glow);
+            outline: none;
+        }
+
+        .braille-output {
+            font-size: 2rem;
+            min-height: 50px;
+            padding: 10px;
+            border: 1px dashed var(--border-glow);
+            border-radius: 8px;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+
+        .braille-cell {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 120px;
+            margin: 20px auto;
+            padding: 15px;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid var(--border-glow);
+            border-radius: 15px;
+            box-shadow: var(--shadow-5d);
+            outline: none;
+        }
+
+        .dot {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid var(--border-glow);
+            background: transparent;
+            cursor: pointer;
+            box-shadow: inset 0 0 5px var(--border-glow);
+            outline: none;
+        }
+
+        .dot.active {
+            background-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .table-learn {
+            display: none;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-glow);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .learn-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            outline: none;
+            cursor: pointer;
+        }
+
+        video, canvas {
+            display: none;
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 2px solid var(--border-glow);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .doc-hint {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin: 6px 0 0 0;
+            line-height: 1.5;
+        }
+
+        #docStatus {
+            min-height: 1.4em;
+            margin: 6px 0;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        /* Folha de impressão em Braille (só aparece ao imprimir) */
+        #printSheet {
+            display: none;
+        }
+
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        @media print {
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+            }
+            body * {
+                visibility: hidden !important;
+            }
+            #printSheet,
+            #printSheet * {
+                visibility: visible !important;
+            }
+            #printSheet {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: #fff;
+                color: #000;
+                font-size: 22pt;
+                line-height: 1.5;
+            }
+            .print-title {
+                font-size: 14pt;
+                font-weight: bold;
+                margin-bottom: 8mm;
+                word-break: break-word;
+            }
+            .print-line {
+                font-size: 18pt;
+                line-height: 1.5;
+                white-space: pre-wrap;
+                word-break: break-all;
+                font-family: 'Segoe UI Symbol', 'Arial Unicode MS', 'DejaVu Sans', 'Courier New', monospace;
+            }
+            .print-footer {
+                font-size: 10pt;
+                margin-top: 10mm;
+            }
+        }
+    </style>
+</head>
+<body class="talkback-active">
+
+<div class="container" id="mainContainer">
+    <h1 class="tb-target" tabindex="0" data-tb-role="Título nível 1">Inclusitec</h1>
+    
+    <button class="btn tb-target" id="contrastBtn" onclick="toggleContrast()">Alto Contraste</button>
+    <br>
+    <p id="appDef" class="tb-target" tabindex="0" data-tb-role="Descrição do aplicativo">
+        <strong>O Inclusitec</strong> é uma plataforma acessível desenvolvida para leitura, tradução e aprendizado interativo do sistema Braille.
+    </p>
+    <br>
+    <button class="btn tb-target" id="voiceCameraBtn" onclick="startVoiceCamera()">Ativar Câmera por Voz ("Tirar Foto")</button>
+    <video id="videoFeed" autoplay playsinline></video>
+    <canvas id="photoCanvas"></canvas>
+    <br>
+    
+    <button class="btn tb-target" onclick="document.getElementById('fileInput').click()">Selecionar Arquivo de Mídia</button>
+    <br>
+    <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this)">
+    <br>
+    
+    <button class="btn tb-target" onclick="speakRoboticText(document.getElementById('brailleResult').innerText || 'Nenhum texto traduzido')">Ouvir Tradução (Voz Robótica)</button>
+    <br>
+    <div class="spacer"></div>
+
+    <label for="textInput" class="tb-target" tabindex="0">Digite para traduzir em Braille:</label>
+    <textarea id="textInput" class="tb-target" oninput="translateToBraille()" placeholder="Digite seu texto aqui..."></textarea>
+    
+    <label class="tb-target" tabindex="0" id="brailleLabel">Resultado da tradução em Braille:</label>
+    <div class="braille-output tb-target" id="brailleResult" tabindex="0" aria-live="polite" aria-labelledby="brailleLabel"></div>
+
+    <div class="spacer"></div>
+
+    <!-- Conversão de documentos (PDF/DOCX) para impressão em Braille -->
+    <label class="tb-target" tabindex="0" id="docLabel">Converter um documento (PDF ou DOCX) para impressão em Braille:</label>
+    <button class="btn tb-target" onclick="document.getElementById('docInput').click()">Converter PDF ou DOCX para Braille</button>
+    <input type="file" id="docInput" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="handleDocument(this)">
+    <p id="docStatus" class="tb-target" tabindex="0" aria-live="polite"></p>
+    <button class="btn tb-target" id="printBtn" style="display:none" onclick="printBraille()">Imprimir documento em Braille (escolher impressora)</button>
+    <p class="doc-hint tb-target" tabindex="0">
+        O botão <strong>Imprimir</strong> abre a impressão do celular ou do computador: escolha a impressora conectada
+        (Wi-Fi, Bluetooth ou cabo) e confirme. Se preferir, selecione "Salvar como PDF" para guardar o arquivo em Braille.
+    </p>
+
+    <div class="spacer"></div>
+
+    <div style="text-align: center;">
+        <label class="tb-target" tabindex="0" id="cellLabel">Cela Braille Interativa (Alterne os pontos para ouvir a letra):</label>
+        <br>
+        <div class="braille-cell tb-target" id="brailleCell" tabindex="0" onkeydown="handleCellKeyDown(event)" data-tb-role="Cela Braille" aria-labelledby="cellLabel">
+            <button class="dot tb-target" id="dot1" onclick="toggleDot(1)" data-tb-label="Ponto 1" aria-pressed="false"></button>
+            <button class="dot tb-target" id="dot4" onclick="toggleDot(4)" data-tb-label="Ponto 4" aria-pressed="false"></button>
+            <button class="dot tb-target" id="dot2" onclick="toggleDot(2)" data-tb-label="Ponto 2" aria-pressed="false"></button>  
+            <button class="dot tb-target" id="dot5" onclick="toggleDot(5)" data-tb-label="Ponto 5" aria-pressed="false"></button>
+            <button class="dot tb-target" id="dot3" onclick="toggleDot(3)" data-tb-label="Ponto 3" aria-pressed="false"></button>
+            <button class="dot tb-target" id="dot6" onclick="toggleDot(6)" data-tb-label="Ponto 6" aria-pressed="false"></button>
+        </div> 
+        <br>  
+        <button class="btn tb-target" onclick="toggleLearnTable()">Aprender Braille</button> 
+        <br>
+        <div class="table-learn" id="learnTable"></div>
+
+        <button class="btn tb-target" onclick="window.open('https://www.youtube.com/results?search_query=como+aprender+braille', '_blank')">Saiba Mais (Vídeo no YouTube)</button>
+    </div> 
+    <br>
+    <div class="spacer"></div>
+
+    <button class="btn tb-target" id="descBtn" onclick="describePage(this)">Ver Descrição Visual da Página</button>
+</div>
+<br>
+
+<!-- Folha que será impressa com o conteúdo em Braille -->
+<div id="printSheet" aria-hidden="true"></div>
+
+<div class="talkback-bar">
+    <div class="tb-status">
+        <div class="tb-indicator active" id="tbIndicator"></div>
+        <span id="tbStatusText">TalkBack: Ativado</span>
+    </div>
+    <button class="tb-toggle-btn tb-target" id="tbToggleBtn" onclick="TalkBack.toggle()">Alternar Leitor (Alt+T)</button>
+</div>
+
+<!-- Bibliotecas de conversão de documentos (PDF e DOCX) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script>
+    const TalkBack = {
+        enabled: true,
+        focusedElement: null,
+        audioCtx: null,
+
+        init() {
+            document.addEventListener("focusin", (e) => this.handleFocus(e.target));
+            document.addEventListener("click", (e) => {
+                if (this.enabled && e.target.classList.contains("tb-target")) {
+                    this.playAudioFeedback("click");
+                }
+            }, true);
+            document.addEventListener("keydown", (e) => {
+                if (e.altKey && (e.key === "t" || e.key === "T")) {
+                    e.preventDefault();
+                    this.toggle();
+                }
+            });
+
+            document.querySelectorAll('button, input, textarea, a, [tabindex="0"]').forEach(el => {
+                el.classList.add('tb-target');
+            });
+
+            setTimeout(() => {
+                if (this.enabled) {
+                    this.speak("TalkBack ativado. Inclusitec. Dê um toque em qualquer item para ouvir.");
+                }
+            }, 800);
+        },
+
+        toggle() {
+            this.enabled = !this.enabled;
+            const indicator = document.getElementById('tbIndicator');
+            const statusText = document.getElementById('tbStatusText');
+            
+            if (this.enabled) {
+                document.body.classList.add('talkback-active');
+                indicator.classList.add('active');
+                statusText.innerText = "TalkBack: Ativado";
+                this.playAudioFeedback('enable');
+                this.speak("TalkBack ativado.");
+            } else {
+                document.body.classList.remove('talkback-active');
+                indicator.classList.remove('active');
+                statusText.innerText = "TalkBack: Desativado";
+                this.playAudioFeedback('disable');
+                this.speak("TalkBack desativado.");
+            }
+        },
+
+        handleFocus(element) {
+            if (!this.enabled || !element) return;
+
+            if (this.focusedElement) {
+                this.focusedElement.classList.remove('tb-focused');
+            }
+
+            this.focusedElement = element;
+            this.focusedElement.classList.add('tb-focused');
+            
+            this.playAudioFeedback('focus');
+
+            const label = this.getElementDescription(element);
+            this.speak(label);
+
+            document.getElementById('tbStatusText').innerText = label.substring(0, 35) + (label.length > 35 ? '...' : '');
+        },
+
+        getElementDescription(el) {
+            if (el.dataset && el.dataset.tbLabel) {
+                let status = el.classList.contains('active') ? 'Ativado' : 'Desativado';
+                return `${el.dataset.tbLabel}, ${status}. Toque para alterar.`;
+            }
+
+            let role = (el.dataset && el.dataset.tbRole) || '';
+            if (!role) {
+                const tag = el.tagName.toLowerCase();
+                if (tag === 'button') role = 'Botão';
+                else if (tag === 'textarea') role = 'Caixa de texto';
+                else if (tag === 'input') role = 'Campo de entrada';
+                else if (tag === 'h1' || tag === 'h2') role = 'Título';
+                else role = 'Texto';
+            }
+
+            let text = el.innerText || el.placeholder || el.value || el.getAttribute('aria-label') || '';
+            text = text.trim();
+
+            if (el.tagName.toLowerCase() === 'textarea' && !text) {
+                text = "Caixa de texto vazia.";
+            }
+
+            return `${text}. ${role}`;
+        },
+
+        speak(text) {
+            if (!('speechSynthesis' in window) || !text) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        },
+
+        playAudioFeedback(type) {
+            try {
+                if (!this.audioCtx) {
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(this.audioCtx.destination);
+
+                const now = this.audioCtx.currentTime;
+
+                if (type === 'focus') {
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'click') {
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'enable') {
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'disable') {
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                }
+            } catch (e) {}
+        }
+    };
+
+    const brailleMap = {
+        'a': '⠁', 'b': '⠃', 'c': '⠉', 'd': '⠙', 'e': '⠑', 'f': '⠋', 'g': '⠛', 'h': '⠓', 'i': '⠊', 'j': '⠚',
+        'k': '⠅', 'l': '⠇', 'm': '⠍', 'n': '⠝', 'o': '⠕', 'p': '⠏', 'q': '⠟', 'r': '⠗', 's': '⠎', 't': '⠞',
+        'u': '⠥', 'v': '⠧', 'w': '⠺', 'x': '⠭', 'y': '⠽', 'z': '⠵',
+        'á': '⠿', 'à': '⠷', 'â': '⠱', 'ã': '⠯', 'é': '⠮', 'ê': '⠣', 'í': '⠌', 'ó': '⠹', 'ô': '⠪', 'õ': '⠻', 'ú': '⠥', 'ç': '⠯',
+        '0': '⠚', '1': '⠁', '2': '⠃', '3': '⠉', '4': '⠙', '5': '⠑', '6': '⠋', '7': '⠛', '8': '⠓', '9': '⠊',
+        ' ': '⠀', '.': '⠲', ',': '⠂', '!': '⠔', '?': '⠢', '-': '⠤',
+        ':': '⠒', ';': '⠆', '(': '⠪', ')': '⠜', '/': '⠌', '–': '⠤', '—': '⠤'
+    };
+
+    const reverseBrailleMap = {};
+    for (let key in brailleMap) {
+        if (!reverseBrailleMap[brailleMap[key]] && key >= 'a' && key <= 'z') {
+            reverseBrailleMap[brailleMap[key]] = key;
+        }
+    }
+
+    function toggleContrast() {
+        document.body.classList.toggle('high-contrast');
+        const isHigh = document.body.classList.contains('high-contrast');
+        TalkBack.speak(isHigh ? "Modo de alto contraste ativado." : "Modo de alto contraste desativado.");
+    }
+
+    function translateToBraille() {
+        const input = document.getElementById('textInput').value.toLowerCase();
+        let result = '';
+        for (let char of input) {
+            result += brailleMap[char] || char;
+        }
+        document.getElementById('brailleResult').innerText = result;
+    }
+
+    // ============================================================
+    // CONVERSÃO DE DOCUMENTOS (PDF/DOCX) -> BRAILLE PARA IMPRESSÃO
+    // ============================================================
+
+    const BRAILLE_BLANK = '⠀';
+    const BRAILLE_NUMBER_IND = '⠼'; // indicador de número
+    const BRAILLE_CAPITAL_IND = '⠠'; // indicador de maiúscula
+    const CELLS_PER_LINE = 40; // linhas padrão de uma folha Braille (A4)
+    let currentBrailleDoc = null;
+
+    /** Converte texto comum em Braille (com indicadores de número e maiúscula). */
+    function textToBraille(text) {
+        let out = '';
+        let inNumber = false;
+
+        for (const ch of text) {
+            if (ch >= '0' && ch <= '9') {
+                if (!inNumber) out += BRAILLE_NUMBER_IND;
+                out += brailleMap[ch];
+                inNumber = true;
+                continue;
+            }
+            inNumber = false;
+
+            if (ch >= 'A' && ch <= 'Z') {
+                out += BRAILLE_CAPITAL_IND + (brailleMap[ch.toLowerCase()] || ch.toLowerCase());
+                continue;
+            }
+
+            if (ch === '\n' || ch === '\t') {
+                out += '\n';
+                continue;
+            }
+
+            if (ch === ' ' && out.endsWith('\n')) continue; // evita espaço no início da linha
+            out += brailleMap[ch] ?? brailleMap[ch.toLowerCase()] ?? ch;
+        }
+
+        return out;
+    }
+
+    /** Quebra o texto Braille em linhas com no máximo `max` células. */
+    function wrapBrailleLines(text, max) {
+        const lines = [];
+        for (const paragraph of String(text).split('\n')) {
+            let line = '';
+            for (const cell of paragraph) {
+                line += cell;
+                if (line.length >= max) {
+                    lines.push(line);
+                    line = '';
+                }
+            }
+            lines.push(line);
+        }
+        return lines;
+    }
+
+    /** Extrai o texto de um arquivo PDF (usa pdf.js). */
+    async function extractPdfText(file) {
+        if (!window.pdfjsLib) {
+            throw new Error('Biblioteca de PDF não carregada. Verifique sua conexão com a internet.');
+        }
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const data = new Uint8Array(await file.arrayBuffer());
+        const pdf = await pdfjsLib.getDocument({ data }).promise;
+        const pages = [];
+
+        for (let p = 1; p <= pdf.numPages; p++) {
+            const page = await pdf.getPage(p);
+            const content = await page.getTextContent();
+            let line = '';
+            let prevRight = null;
+
+            for (const item of content.items) {
+                if (typeof item.str !== 'string') continue;
+                const x = item.transform ? item.transform[4] : null;
+                const width = item.width || 0;
+
+                // Insere espaço quando há separação horizontal entre trechos
+                if (prevRight !== null && x !== null && line && !/\s$/.test(line) && item.str && !/^\s/.test(item.str)) {
+                    if (x - prevRight > 1) line += ' ';
+                }
+
+                line += item.str;
+                prevRight = x !== null ? x + width : null;
+
+                if (item.hasEOL) {
+                    pages.push(line);
+                    line = '';
+                    prevRight = null;
+                }
+            }
+            if (line) pages.push(line);
+            pages.push(''); // quebra entre páginas
+        }
+
+        return pages.join('\n').replace(/\n{3,}/g, '\n\n');
+    }
+
+    /** Extrai o texto de um arquivo DOCX (document.xml dentro do pacote Office). */
+    async function extractDocxText(file) {
+        if (!window.JSZip) {
+            throw new Error('Biblioteca de DOCX não carregada. Verifique sua conexão com a internet.');
+        }
+        const zip = await JSZip.loadAsync(await file.arrayBuffer());
+        const entry = zip.file('word/document.xml');
+        if (!entry) throw new Error('Arquivo DOCX inválido (word/document.xml não encontrado).');
+
+        const xml = await entry.async('string');
+        const doc = new DOMParser().parseFromString(xml, 'application/xml');
+        const paragraphs = doc.getElementsByTagName('w:p');
+        const lines = [];
+
+        for (const p of paragraphs) {
+            let line = '';
+            const runs = p.getElementsByTagName('w:t');
+            for (const run of runs) line += run.textContent;
+            lines.push(line);
+        }
+
+        return lines.join('\n');
+    }
+
+    /** Monta a folha que será enviada para a impressora. */
+    function buildPrintSheet(fileName, brailleText) {
+        const sheet = document.getElementById('printSheet');
+        sheet.innerHTML = '';
+
+        const title = document.createElement('div');
+        title.className = 'print-title';
+        title.textContent = fileName + ' — Convertido para Braille pelo Inclusitec';
+        sheet.appendChild(title);
+
+        for (const line of wrapBrailleLines(brailleText, CELLS_PER_LINE)) {
+            const div = document.createElement('div');
+            div.className = 'print-line';
+            div.textContent = line || BRAILLE_BLANK;
+            sheet.appendChild(div);
+        }
+
+        const footer = document.createElement('div');
+        footer.className = 'print-footer';
+        footer.textContent = 'Inclusitec — impressão em Braille — ' + new Date().toLocaleDateString('pt-BR');
+        sheet.appendChild(footer);
+    }
+
+    /** Função principal: recebe o PDF/DOCX, converte e libera o botão Imprimir. */
+    async function handleDocument(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+
+        const status = document.getElementById('docStatus');
+        const printBtn = document.getElementById('printBtn');
+        printBtn.style.display = 'none';
+        currentBrailleDoc = null;
+
+        const ext = (file.name.split('.').pop() || '').toLowerCase();
+        status.innerText = `Convertendo "${file.name}" para Braille...`;
+        TalkBack.speak(`Convertendo o arquivo ${file.name} para Braille. Aguarde.`);
+
+        try {
+            let text = '';
+            if (ext === 'pdf') {
+                text = await extractPdfText(file);
+            } else if (ext === 'docx') {
+                text = await extractDocxText(file);
+            } else {
+                throw new Error('Formato não suportado. Envie um arquivo PDF ou DOCX.');
+            }
+
+            text = String(text || '').replace(/\r/g, '').replace(/[ \t]+\n/g, '\n').trim();
+            if (!text) throw new Error('Nenhum texto encontrado dentro do arquivo.');
+
+            const braille = textToBraille(text);
+
+            document.getElementById('textInput').value = text;
+            document.getElementById('brailleResult').innerText = braille;
+            buildPrintSheet(file.name, braille);
+
+            currentBrailleDoc = { name: file.name, text: text, braille: braille };
+            printBtn.style.display = 'block';
+
+            const chars = text.length;
+            status.innerText = `Arquivo "${file.name}" convertido com sucesso! ${chars} caracteres em Braille. Toque em "Imprimir documento em Braille" para escolher a impressora.`;
+            TalkBack.speak(`Arquivo ${file.name} convertido com sucesso para Braille. Botão Imprimir disponível abaixo do resultado.`);
+        } catch (err) {
+            status.innerText = 'Erro na conversão: ' + (err && err.message ? err.message : err);
+            TalkBack.speak('Erro na conversão do documento: ' + (err && err.message ? err.message : err));
+        } finally {
+            input.value = '';
+        }
+    }
+
+    /** Abre a janela de impressão do celular/computador para escolher a impressora. */
+    function printBraille() {
+        if (!currentBrailleDoc) {
+            TalkBack.speak('Nenhum documento convertido ainda. Converta um PDF ou DOCX primeiro.');
+            return;
+        }
+        TalkBack.speak('Abrindo a impressão do dispositivo. Selecione a impressora conectada e confirme.');
+        setTimeout(() => window.print(), 400);
+    }
+
+    function speakRoboticText(text) {
+        if (!('speechSynthesis' in window) || !text) return;
+        window.speechSynthesis.cancel();
+
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.1);
+        } catch(e) {}
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pt-BR';
+        utterance.pitch = 0.2;
+        utterance.rate = 0.8;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    const activeDots = new Set();
+
+    function toggleDot(dotNum) {
+        const btn = document.getElementById('dot' + dotNum);
+        if (activeDots.has(dotNum)) {
+            activeDots.delete(dotNum);
+            btn.classList.remove('active');
+            btn.setAttribute('aria-pressed', 'false');
+        } else {
+            activeDots.add(dotNum);
+            btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
+        }
+
+        let code = 0x2800;
+        if (activeDots.has(1)) code += 0x01;
+        if (activeDots.has(2)) code += 0x02;
+        if (activeDots.has(3)) code += 0x04;
+        if (activeDots.has(4)) code += 0x08;
+        if (activeDots.has(5)) code += 0x10;
+        if (activeDots.has(6)) code += 0x20;
+
+        const brailleChar = String.fromCharCode(code);
+        const letter = reverseBrailleMap[brailleChar] || "combinação personalizada";
+
+        TalkBack.speak(`Ponto ${dotNum} ${activeDots.has(dotNum) ? 'ativado' : 'desativado'}. Padrão atual: ${letter.toUpperCase()}`);
+    }
+
+    function handleCellKeyDown(e) {
+        if (e.key >= '1' && e.key <= '6') {
+            toggleDot(parseInt(e.key));
+        }
+    }
+
+    function toggleLearnTable() {
+        const table = document.getElementById('learnTable');
+        if (table.style.display === 'block') {
+            table.style.display = 'none';
+            TalkBack.speak("Tabela de aprendizado oculta.");
+        } else {
+            table.style.display = 'block';
+            if (!table.innerHTML) {
+                let html = '';
+                for (let i = 97; i <= 122; i++) {
+                    const char = String.fromCharCode(i);
+                    const bChar = brailleMap[char] || '';
+                    html += `<div class="learn-row tb-target" tabindex="0" onclick="TalkBack.speak('Letra ${char.toUpperCase()} em Braille é ${bChar}')">
+                        <span>Letra ${char.toUpperCase()}</span>
+                        <span style="font-size:1.5rem;">${bChar}</span>
+                    </div>`;
+                }
+                table.innerHTML = html;
+                table.querySelectorAll('.tb-target').forEach(el => {
+                    el.addEventListener('focus', () => TalkBack.handleFocus(el));
+                });
+            }
+            TalkBack.speak("Tabela de aprendizado em Braille exibida.");
+        }
+    }
+
+    let recognition;
+    let cameraStream = null;
+    let checkInterval = null;
+
+    function startVoiceCamera() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            TalkBack.speak("O reconhecimento de voz não é suportado neste navegador.");
+            return;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = 'pt-BR';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        TalkBack.speak("Ouvindo comando de voz. Diga tirar foto.");
+        document.getElementById('voiceCameraBtn').innerText = "Ouvindo... (Diga 'tirar foto')";
+
+        recognition.start();
+
+        recognition.onresult = (event) => {
+            const speechResult = event.results[0][0].transcript.toLowerCase().trim();
+            document.getElementById('voiceCameraBtn').innerText = `Comando: "${speechResult}"`;
+
+            if (speechResult.includes("tirar foto") || speechResult.includes("foto")) {
+                TalkBack.speak("Comando reconhecido. Ativando câmera. Aponte exclusivamente para um texto em Braille.");
+                openCameraAndScanBraille();
+            } else {
+                TalkBack.speak(`Comando não reconhecido: ${speechResult}. Diga tirar foto.`);
+            }
+        };
+
+        recognition.onerror = () => {
+            TalkBack.speak("Erro no reconhecimento de voz. Tente novamente.");
+            document.getElementById('voiceCameraBtn').innerText = "Ativar Câmera por Voz (\"Tirar Foto\")";
+        };
+
+        recognition.onspeechend = () => {
+            recognition.stop();
+        };
+    }
+
+    // ============================================================
+    // ENDEREÇO DA API (funciona em localhost, IP local, túnel e Vercel)
+    // ============================================================
+    let apiBase = null; // '' = mesma origem (recomendado em túnel/localhost)
+
+    function apiCandidates() {
+        const list = [];
+        // Página servida pelo Flask (localhost, IP da rede, dev tunnel, ngrok...)
+        // -> usa a MESMA origem, evitando bloqueio de mixed content (https -> http)
+        if (location.protocol !== 'file:') list.push('');
+        // Fallback: backend rodando na máquina local
+        list.push('http://localhost:5000');
+        return list;
+    }
+
+    async function probeBase(base) {
+        try {
+            const response = await fetch(base + '/api/health', { cache: 'no-store' });
+            if (!response.ok) return false;
+            const result = await response.json();
+            return result && result.status === 'ok';
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async function resolveApiBase() {
+        if (apiBase !== null && await probeBase(apiBase)) return apiBase;
+        for (const base of apiCandidates()) {
+            if (base === apiBase) continue;
+            if (await probeBase(base)) {
+                apiBase = base;
+                return base;
+            }
+        }
+        return apiBase;
+    }
+
+    async function sendImageToBackend(canvas) {
+        try {
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            const base = (await resolveApiBase()) || '';
+            const response = await fetch(base + '/api/detect-braille', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image_base64: imageData })
+            });
+            
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Erro ao enviar imagem para o backend:', error);
+            return { success: false, error: 'Erro de conexão com o servidor.' };
+        }
+    }
+
+    function openCameraAndScanBraille() {
+        const video = document.getElementById('videoFeed');
+        const canvas = document.getElementById('photoCanvas');
+
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    cameraStream = stream;
+                    video.style.display = 'block';
+                    video.srcObject = stream;
+
+                    let attempts = 0;
+                    const maxAttempts = 12;
+
+                    checkInterval = setInterval(async () => {
+                        attempts++;
+                        
+                        canvas.width = video.videoWidth || 640;
+                        canvas.height = video.videoHeight || 480;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        const result = await sendImageToBackend(canvas);
+
+                        if (result.success && result.cells_detected > 0) {
+                            clearInterval(checkInterval);
+                            stopCamera();
+
+                            canvas.style.display = 'block';
+                            const translatedText = result.text || "Texto detectado";
+                            document.getElementById('textInput').value = translatedText;
+                            translateToBraille();
+
+                            TalkBack.speak(`Foto capturada com sucesso! ${result.cells_detected} células de Braille detectadas. Tradução: ${translatedText}`);
+                            document.getElementById('voiceCameraBtn').innerText = "Ativar Câmera por Voz (\"Tirar Foto\")";
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(checkInterval);
+                            stopCamera();
+
+                            TalkBack.speak("Captura cancelada. A imagem focada não contém um texto ou padrão Braille válido.");
+                            document.getElementById('voiceCameraBtn').innerText = "Ativar Câmera por Voz (\"Tirar Foto\")";
+                        }
+                    }, 500);
+
+                })
+                .catch(() => {
+                    TalkBack.speak("Não foi possível acessar a câmera do dispositivo.");
+                    document.getElementById('voiceCameraBtn').innerText = "Ativar Câmera por Voz (\"Tirar Foto\")";
+                });
+        } else {
+            TalkBack.speak("Recurso de câmera não suportado neste navegador.");
+        }
+    }
+
+    function stopCamera() {
+        const video = document.getElementById('videoFeed');
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+        video.style.display = 'none';
+    }
+
+    async function checkBackendStatus() {
+        const base = await resolveApiBase();
+        if (base !== null && await probeBase(base)) return true;
+        // Última tentativa: varre todas as opções de endereço
+        for (const candidate of apiCandidates()) {
+            if (await probeBase(candidate)) {
+                apiBase = candidate;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    async function updateBackendIndicator() {
+        const isOnline = await checkBackendStatus();
+        let indicator = document.getElementById('backendStatus');
+        
+        if (!indicator) {
+            indicator = document.createElement('div');
+            indicator.id = 'backendStatus';
+            indicator.style.cssText = 'position:fixed;top:10px;right:10px;padding:8px 16px;border-radius:20px;font-size:0.8rem;font-weight:bold;z-index:10000;';
+            document.body.appendChild(indicator);
+        }
+        
+        if (isOnline) {
+            indicator.textContent = 'IA Online';
+            indicator.style.background = '#00ff66';
+            indicator.style.color = '#000';
+        } else {
+            indicator.textContent = 'IA Offline';
+            indicator.style.background = '#ff3333';
+            indicator.style.color = '#fff';
+        }
+    }
+
+    async function handleFile(input) {
+        if (input.files && input.files[0]) {
+            TalkBack.speak(`Arquivo selecionado. Analisando imagem com IA...`);
+            
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const result = await sendImageToBackend(canvas);
+                    
+                    if (result.success && result.cells_detected > 0) {
+                        const translatedText = result.text || "Texto detectado";
+                        document.getElementById('textInput').value = translatedText;
+                        translateToBraille();
+                        TalkBack.speak(`Imagem analisada com sucesso! ${result.cells_detected} células de Braille detectadas. Tradução: ${translatedText}`);
+                    } else {
+                        TalkBack.speak("Nenhum padrão de Braille encontrado na imagem selecionada.");
+                    }
+                };
+                img.src = e.target.result;
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    }
+
+    let isDescribing = false;
+
+    function describePage(btnElement) {
+        if (isDescribing) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            isDescribing = false;
+            TalkBack.speak("Descrição interrompida.");
+        } else {
+            isDescribing = true;
+            const desc = "A página do Inclusitec possui: ativação de câmera via comando de voz restrita ao reconhecimento Braille, alto contraste, leitor TalkBack integrado, tradutor de texto para Braille e cela interativa.";
+            
+            if ("speechSynthesis" in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(desc);
+                utterance.lang = "pt-BR";
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                utterance.onend = () => { isDescribing = false; };
+                utterance.onerror = () => { isDescribing = false; };
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        if (btnElement) {
+            btnElement.blur();
+        } else {
+            document.getElementById("descBtn").blur();
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        TalkBack.init();
+        updateBackendIndicator();
+        setInterval(updateBackendIndicator, 10000);
+    });
+</script>
+</body>
+</html>

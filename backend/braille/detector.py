@@ -1,79 +1,19 @@
 """
 Detecção de padrões de Braille em imagens.
 
-Utiliza visão computacional (OpenCV) para localizar os pontos
-elevados do Braille e agrupá-los em células de 6 pontos.
+IA única do projeto: utiliza visão computacional (OpenCV)
+para localizar os pontos elevados do Braille e agrupá-los
+em células de 6 pontos.
 
-A arquitetura permite substituir a detecção por um modelo
-YOLO treinado: basta colocar o arquivo 'braille_yolo.pt'
-na raiz do projeto (ou apontar DETECTOR_SETTINGS['yolo_model_path']).
+Toda a detecção da aplicação (API web, cliente desktop e
+testes) passa por esta classe — não existe outro motor de
+detecção.
 """
-
-import os
 
 import cv2
 import numpy as np
 
 import config
-
-try:
-    from ultralytics import YOLO
-    YOLO_AVAILABLE = True
-except ImportError:
-    YOLO_AVAILABLE = False
-
-
-class YOLOBrailleDetector:
-    """
-    Detector de Braille usando YOLO (Ultralytics).
-
-    Classes esperadas no modelo YOLO:
-    - 26 classes (a-z), ou
-    - 6 classes (pontos 1-6) para detecção individual de pontos.
-    """
-
-    def __init__(self, model_path=None):
-        self.model_path = model_path or os.path.join(
-            config.BASE_DIR, config.DETECTION_SETTINGS.get('yolo_model_path', 'braille_yolo.pt')
-        )
-        self.model = None
-
-        if YOLO_AVAILABLE and os.path.exists(self.model_path):
-            try:
-                self.model = YOLO(self.model_path)
-                print(f"Modelo YOLO carregado: {self.model_path}")
-            except Exception as e:
-                print(f"Erro ao carregar modelo YOLO: {e}")
-
-    def is_available(self):
-        return self.model is not None
-
-    def detect(self, image):
-        """Detecta Braille usando YOLO. Retorna uma lista de células."""
-        if not self.is_available():
-            return None
-
-        results = self.model(image, verbose=False)
-        min_confidence = config.DETECTION_SETTINGS.get('yolo_min_confidence', 0.5)
-
-        cells = []
-        for result in results:
-            for box in result.boxes:
-                conf = float(box.conf[0])
-                if conf > min_confidence:
-                    cells.append(self._class_to_cell(int(box.cls[0])))
-
-        return cells
-
-    def _class_to_cell(self, cls):
-        """Converte uma classe YOLO para tupla de pontos Braille."""
-        from backend.braille.mapping import BRAILLE_TO_PT_BR
-
-        letter = chr(ord('a') + cls) if cls < 26 else '?'
-        for pattern, char in BRAILLE_TO_PT_BR.items():
-            if char == letter:
-                return pattern
-        return (0, 0, 0, 0, 0, 0)
 
 
 class BrailleDetector:

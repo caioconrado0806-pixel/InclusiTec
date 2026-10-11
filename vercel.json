@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "app.py": {
+    "api/index.py": {
       "excludeFiles": "{assets/**,desktop/**,scripts/**,tests/**,data/**,.git/**,**/__pycache__/**,**/*.pyc,*.pt,*.pth,*.onnx,folha_braille_inclusitec.png,install.bat,README.md}"
     }
   }

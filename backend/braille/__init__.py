@@ -6,7 +6,7 @@ do projeto (API, cliente desktop, testes).
 """
 
 from backend.braille.converter import BrailleToPortuguese
-from backend.braille.detector import BrailleDetector, YOLOBrailleDetector, YOLO_AVAILABLE
+from backend.braille.detector import BrailleDetector
 from backend.braille.mapping import (
     BRAILLE_NUMBERS,
     BRAILLE_TO_PT_BR,
@@ -19,8 +19,6 @@ __all__ = [
     'BrailleDetector',
     'BrailleToPortuguese',
     'PortugueseToBraille',
-    'YOLOBrailleDetector',
-    'YOLO_AVAILABLE',
     'BRAILLE_NUMBERS',
     'BRAILLE_TO_PT_BR',
     'PT_BR_TO_BRAILLE',

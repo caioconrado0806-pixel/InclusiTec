@@ -3,12 +3,15 @@
 Sistema de detecção de Braille em imagens com conversão para
 português brasileiro. **Backend e frontend 100% em Python.**
 
+🔗 **Versão online: https://inclusitec.com**
+
 ```
   ┌──────────────────────────────────────────────────┐
-  │  Python app.py (Flask)                           │
-  │  ├─ API REST        /api/detect-braille          │
-  │  │                  /api/cadastro, /api/health   │
-  │  └─ Frontend web    templates + static (HTML/JS) │
+  │  Python api/index.py (Flask)                     │
+  │  ├─ API REST    /api/detect-braille              │
+  │  │                /api/cadastro, /api/health     │
+  │  │                /api/braille/pdf, /api/print   │
+  │  └─ Frontend web  templates + static (HTML/JS)   │
   └──────────────────────────────────────────────────┘
         ▲                          ▲
         │ HTTP                     │ HTTP
@@ -21,27 +24,25 @@ português brasileiro. **Backend e frontend 100% em Python.**
 
 ## Funcionalidades
 
-<<<<<<< HEAD
-- **Detecção de Braille**: OpenCV (padrão) ou YOLO (opcional,
-  coloque `braille_yolo.pt` na raiz)
+- **Detecção de Braille**: IA única baseada em visão
+  computacional (OpenCV) — localiza os pontos elevados
+  e traduz para texto
 - **Conversão para PT-BR**: células Braille → texto brasileiro,
   incluindo acentos e numeração (indicador ⠼)
 - **Frontend web acessível**: alto contraste, síntese de voz,
   vibração, câmera por comando de voz e célula interativa
+- **Câmera em tempo real**: captura imagens da câmera para
+  detecção instantânea
+- **Upload de imagens**: permite selecionar arquivos de imagem
+  para análise
+- **Conversor de documentos**: converte **PDF** em texto
+  Braille pronto para impressão (.brf/.brl/.txt)
+- **Impressão em Braille**: envia o documento à impressora
+  conectada (Wi-Fi, Bluetooth ou cabo) ou salva como PDF
 - **Frontend desktop**: cliente em Python (Tkinter) com voz
   e captura de câmera
 - **Cadastro de usuários**: API + persistência em
   JSON/CSV (abre no Excel)
-=======
-- **Detecção de Braille**: Usa YOLO (Ultralytics) ou OpenCV para detectar padrões de Braille em imagens
-- **Conversão para PT-BR**: Converte células Braille para texto em português brasileiro
-- **Interface Acessível**: Mantém o frontend existente com suporte a TalkBack e alto contraste
-- **Câmera em Tempo Real**: Captura imagens da câmera para detecção instantânea
-- **Upload de Imagens**: Permite selecionar arquivos de imagem para análise
-- **Conversor de Documentos**: Botão que converte arquivos **PDF** e **DOCX** em texto Braille pronto para impressão
-- **Impressão em Braille**: Após a conversão, aparece o botão **Imprimir**, que abre a impressão do celular ou do
-  computador para enviar o documento à impressora conectada (Wi-Fi, Bluetooth ou cabo) ou salvar como PDF
->>>>>>> origin/main
 
 ## Requisitos
 
@@ -58,16 +59,25 @@ No Windows, você pode usar o `install.bat`.
 
 ## Uso
 
-### 1. Iniciar o servidor (backend + frontend web)
+### 1. Versão online
+
+A aplicação já está no ar em **https://inclusitec.com**
+(implantada na Vercel — o entrypoint serverless é
+`api/index.py`, apontado no `vercel.json`).
+
+### 2. Iniciar o servidor localmente (backend + frontend web)
 
 ```bash
-python app.py
+python -m flask --app api.index run
 ```
 
 Acesse **http://localhost:5000** — a interface web é servida
 pelo próprio Python.
 
-### 2. (Opcional) Cliente desktop em Python
+Alternativa: `vercel dev` roda localmente no mesmo modo
+serverless da nuvem.
+
+### 3. (Opcional) Cliente desktop em Python
 
 ```bash
 python desktop/client.py
@@ -75,7 +85,7 @@ python desktop/client.py
 
 Interface gráfica com câmera, leitura de arquivo e voz.
 
-### 3. Usar a detecção
+### 4. Usar a detecção
 
 1. **Por câmera**: "Capturar Foto Agora" ou "Tirar Foto
    (Comando de Voz)" → diga "tirar foto"
@@ -127,24 +137,48 @@ Salva em `data/cadastros.json` e exporta
 
 Verifica o servidor e mostra o detector ativo.
 
+### `POST /api/braille/pdf`
+
+PDF via multipart (`pdf`). Extrai o texto e devolve
+a conversão em Braille, pronta para impressão:
+
+```json
+{
+  "success": true,
+  "paginas": 3,
+  "celulas": 1204,
+  "braille_preview": "⠊⠝⠉⠇⠥⠎⠊⠞⠑⠉...",
+  "arquivos": {
+    "brf": { "url": "/api/braille/jobs/<id>/download/brf" },
+    "brl": { "url": "/api/braille/jobs/<id>/download/brl" },
+    "txt": { "url": "/api/braille/jobs/<id>/download/txt" }
+  }
+}
+```
+
+### `GET /api/printers` e `POST /api/print`
+
+Lista as impressoras do sistema e envia o arquivo
+convertido (`.brf`) à impressora Braille conectada
+(Wi-Fi, Bluetooth ou cabo).
+
 ## Estrutura do Projeto
 
 ```
 inclusitec/
-├── app.py                  # ponto de entrada (Flask)
+├── api/index.py            # entrypoint da app (Vercel)
 ├── config.py               # configuração central
 ├── backend/
 │   ├── braille/            # núcleo: mapeamentos, detector,
 │   │                       #         conversor (fonte única)
-│   ├── api/                # rotas: detect, cadastro, health
+│   ├── api/                # rotas: detect, cadastro, health,
+│   │                       #         pdf -> braille, print
 │   └── services/           # lógica de negócio (cadastro)
 ├── frontend/
 │   ├── templates/index.html
 │   └── static/{css,js}/    # servidos pelo Flask
 ├── desktop/client.py       # frontend Python (Tkinter)
 ├── tests/test_braille.py   # testes do núcleo
-├── scripts/                # utilitários (gerar folha
-│                           #   Braille, apresentações)
 ├── assets/                 # imagens e mídia
 └── data/                   # cadastros (criado em runtime)
 ```
@@ -155,24 +189,15 @@ inclusitec/
 python -m unittest discover -s tests -v
 ```
 
-## Usando um Modelo YOLO Treinado
+## IA de Detecção
 
-1. Treine um modelo com seu dataset de imagens de Braille
-   (26 classes a-z ou 6 classes de pontos)
-2. Salve como `braille_yolo.pt` na raiz do projeto
-3. O detector carrega o modelo automaticamente
+O projeto utiliza **uma única IA** para detectar Braille:
+o detector baseado em OpenCV (`backend/braille/detector.py`).
+Não há dependência de modelos externos — a detecção roda
+100% no servidor com apenas `opencv-python-headless`.
 
-### Estrutura do Dataset
-
-```
-dataset/
-├── images/
-│   ├── train/  (img001.jpg, ...)
-│   └── val/    (img101.jpg, ...)
-└── labels/
-    ├── train/  (img001.txt, ...)
-    └── val/    (...)
-```
+Essa mesma IA única atende todos os clientes: o site
+**https://inclusitec.com**, o cliente desktop e os testes.
 
 ## Notas de Acessibilidade
 

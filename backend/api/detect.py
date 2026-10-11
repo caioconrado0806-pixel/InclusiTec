@@ -12,19 +12,13 @@ import cv2
 import numpy as np
 from flask import Blueprint, jsonify, request
 
-from backend.braille import (
-    BrailleDetector,
-    BrailleToPortuguese,
-    YOLOBrailleDetector,
-)
+from backend.braille import BrailleDetector, BrailleToPortuguese
 
 bp = Blueprint('detect', __name__)
 
-yolo_detector = YOLOBrailleDetector()
+# IA única de detecção: o detector OpenCV.
 detector = BrailleDetector()
 converter = BrailleToPortuguese()
-
-USING_YOLO = yolo_detector.is_available()
 
 
 def _decode_image(data):
@@ -70,12 +64,8 @@ def detect_braille():
                 'error': 'Nenhuma imagem fornecida. Envie como arquivo (multipart "image") ou base64 (JSON "image_base64").'
             }), 400
 
-        # Detecta as células (YOLO, se houver modelo; caso contrário OpenCV).
-        if USING_YOLO:
-            cells = yolo_detector.detect(image) or []
-            vis_image = image.copy()
-        else:
-            cells, vis_image = detector.detect_braille_in_image(image)
+        # Detecta as células com a IA única do projeto (OpenCV).
+        cells, vis_image = detector.detect_braille_in_image(image)
 
         if not cells:
             return jsonify({
@@ -110,5 +100,5 @@ def detect_braille():
 
 
 def detector_name():
-    """Nome do detector ativo (yolo ou opencv)."""
-    return 'yolo' if USING_YOLO else 'opencv'
+    """Nome do detector ativo (IA única do projeto)."""
+    return 'opencv'

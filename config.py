@@ -72,15 +72,11 @@ BRAILLE_LINE_WIDTH = 40
 # -------------------------------------------------------------
 
 DETECTION_SETTINGS = {
-    # Detecção por OpenCV (padrão)
+    # Detecção por OpenCV — a IA única do projeto.
     'min_dot_radius': 3,
     'max_dot_radius': 25,
     'min_distance_between_dots': 15,
     'max_distance_between_dots': 80,
-
-    # Detecção por YOLO (opcional, requer ultralytics + modelo)
-    'yolo_model_path': 'braille_yolo.pt',
-    'yolo_min_confidence': 0.5,
 }
 
 # -------------------------------------------------------------
