@@ -2,9 +2,8 @@
  * Inclusitec - Lógica do frontend
  *
  * Fluxo da aplicação:
- *   1. Cadastro  -> POST /api/cadastro   (salva no servidor + cópia local)
- *   2. Leitura   -> POST /api/detect-braille (câmera ou arquivo -> texto PT-BR)
- *   3. Tradução  -> texto <-> Braille (tabela local, mesma convenção do backend)
+ *   1. Leitura   -> POST /api/detect-braille (câmera ou arquivo -> texto PT-BR)
+ *   2. Tradução  -> texto <-> Braille (tabela local, mesma convenção do backend)
  */
 
 // -------------------------------------------------------------
@@ -33,24 +32,6 @@ const cellMap = {
     '125': 'H', '24': 'I', '245': 'J', '13': 'K', '123': 'L', '134': 'M', '1345': 'N',
     '135': 'O', '1234': 'P', '12345': 'Q', '1235': 'R', '234': 'S', '2345': 'T',
     '136': 'U', '1236': 'V', '2456': 'W', '1346': 'X', '13456': 'Y', '1356': 'Z'
-};
-
-// -------------------------------------------------------------
-// BANCO DE DADOS LOCAL (IndexedDB) - cópia de segurança dos cadastros
-// -------------------------------------------------------------
-
-let db;
-const request = indexedDB.open('InclusitecDB', 1);
-
-request.onupgradeneeded = function (e) {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains('cadastros')) {
-        db.createObjectStore('cadastros', { keyPath: 'id', autoIncrement: true });
-    }
-};
-
-request.onsuccess = function (e) {
-    db = e.target.result;
 };
 
 // -------------------------------------------------------------
@@ -142,54 +123,7 @@ function handleCellKeyDown(e) {
 }
 
 // -------------------------------------------------------------
-// FLUXO 1 - CADASTRO
-// -------------------------------------------------------------
-
-async function salvarCadastro(event) {
-    event.preventDefault();
-
-    const dados = {
-        nome: document.getElementById('nome').value,
-        email: document.getElementById('email').value,
-        telefone: document.getElementById('telefone').value,
-        perfil: document.getElementById('perfil').value,
-        dataCadastro: new Date().toLocaleString('pt-BR')
-    };
-
-    // 1. Salva no banco local do navegador (IndexedDB) - cópia de segurança
-    try {
-        const transaction = db.transaction(['cadastros'], 'readwrite');
-        transaction.objectStore('cadastros').add(dados);
-    } catch (e) {
-        console.error('Erro ao salvar localmente:', e);
-    }
-
-    // 2. Envia para a API Python (salva no servidor)
-    try {
-        speakText('Processando cadastro...');
-        const response = await fetch('/api/cadastro', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dados)
-        });
-
-        if (!response.ok) {
-            const erro = await response.json().catch(() => ({}));
-            throw new Error(erro.error || 'Erro no servidor');
-        }
-
-        speakText('Cadastro efetuado com sucesso!');
-        alert('Cadastro realizado com sucesso! Dados salvos no servidor.');
-        document.getElementById('cadastroForm').reset();
-    } catch (error) {
-        console.error('Erro no envio:', error);
-        speakText('Cadastro salvo localmente, mas não foi possível conectar ao servidor.');
-        alert(`Cadastro salvo localmente no navegador! Erro ao conectar com o servidor: ${error.message}`);
-    }
-}
-
-// -------------------------------------------------------------
-// FLUXO 2 - LEITURA DE BRAILLE (CÂMERA E ARQUIVO)
+// FLUXO 1 - LEITURA DE BRAILLE (CÂMERA E ARQUIVO)
 // -------------------------------------------------------------
 
 function setStatus(msg) {
@@ -239,44 +173,13 @@ async function detectFromDataUrl(dataUrl) {
     }
 }
 
-/** Captura o frame atual do vídeo e envia para detecção. */
-function detectPhoto() {
-    const video = document.getElementById('videoFeed');
-    const canvas = document.getElementById('photoCanvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-    detectFromDataUrl(dataUrl);
-}
-
-/** Ativa a câmera, captura após 3s e detecta (fluxo por comando de voz). */
-function capturePhoto() {
-    const video = document.getElementById('videoFeed');
-    video.style.display = 'block';
-    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-        video.srcObject = stream;
-        video.play();
-        setTimeout(() => {
-            stream.getTracks().forEach(track => track.stop());
-            video.style.display = 'none';
-            detectPhoto();
-            speakText('Imagem Braille identificada e capturada com sucesso.');
-        }, 3000);
-    }).catch(() => {
-        video.style.display = 'none';
-        speakText('Erro ao acessar a câmera.');
-        setStatus('Erro ao acessar a câmera.');
-    });
-}
-
-/** Ativa o reconhecimento de voz; ao ouvir "tirar foto", captura. */
+/** Ativa o reconhecimento de voz; ao ouvir "tirar foto", abre o enquadramento. */
 function startVoiceCamera() {
     speakText('Microfone ativado. Diga: tirar foto.');
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        alert('Reconhecimento de voz não suportado neste navegador. Use "Capturar Foto Agora".');
+        // Sem reconhecimento de voz neste navegador: abre a câmera direto.
+        abrirEnquadramento();
         return;
     }
 
@@ -287,22 +190,11 @@ function startVoiceCamera() {
     recognition.onresult = (event) => {
         const command = event.results[0][0].transcript.toLowerCase();
         if (command.includes('tirar foto')) {
-            capturePhoto();
+            abrirEnquadramento();
         } else {
             speakText('Comando não reconhecido. Tente dizer tirar foto.');
         }
     };
-}
-
-/** Captura a foto diretamente, sem comando de voz. */
-function capturarFotoDireta() {
-    const video = document.getElementById('videoFeed');
-    // Se a câmera já está ativa, captura o frame; caso contrário, ativa e captura.
-    if (video.srcObject && video.srcObject.active) {
-        detectPhoto();
-    } else {
-        capturePhoto();
-    }
 }
 
 /** Lê o arquivo selecionado e envia para detecção. */
@@ -364,8 +256,8 @@ function toggleLearnTable() {
 function describePage() {
     const description = (
         'Você está no aplicativo Inclusitec. A página tem cinco seções: ' +
-        'cadastro de usuário; leitura de Braille por câmera ou arquivo, com tradução e imagem dos pontos detectados; ' +
-        'conversão de PDF em arquivo para impressora Braille, com botão imprimir; ' +
+        'leitura de Braille por câmera ou arquivo, com tradução e imagem dos pontos detectados; ' +
+        'conversão de documentos, como PDF, Word e texto, em arquivo para impressora Braille, com botão imprimir; ' +
         'tradução de texto digitado para Braille; célula interativa de seis pontos para treino; ' +
         'e tabela de aprendizado com descrição da página.'
     );
@@ -373,7 +265,7 @@ function describePage() {
 }
 
 // -------------------------------------------------------------
-// FLUXO 3 - PDF -> IMPRESSORA BRAILLE (conversão + impressão)
+// FLUXO 2 - DOCUMENTO -> IMPRESSORA BRAILLE (conversão + impressão)
 // -------------------------------------------------------------
 
 // Último trabalho de conversão realizado nesta sessão.
@@ -389,30 +281,22 @@ function setPrintStatus(msg) {
     if (el) el.innerText = msg || '';
 }
 
-/** Abre o seletor de arquivos do conversor de PDF. */
+/** Abre o seletor de arquivos do conversor de documentos. */
 function selecionarPdfBraille() {
     triggerVibration(40);
     playBeep(600);
     document.getElementById('pdfInput').click();
 }
 
-/** Envia o PDF escolhido para /api/braille/pdf e mostra o resultado. */
+/** Envia o documento escolhido para /api/braille/pdf e mostra o resultado. */
 async function converterPdfBraille(input) {
     const file = input.files && input.files[0];
     if (!file) return;
 
-    const isPdf = /\.pdf$/i.test(file.name) || file.type === 'application/pdf';
-    if (!isPdf) {
-        setPdfStatus('Arquivo inválido: escolha um documento com extensão .pdf.');
-        speakText('Arquivo inválido. Escolha um arquivo PDF.');
-        input.value = '';
-        return;
-    }
-
     document.getElementById('pdfResult').style.display = 'none';
     document.getElementById('printBox').style.display = 'none';
     setPdfStatus(`Convertendo "${file.name}" para Braille... Aguarde.`);
-    speakText('Convertendo o arquivo PDF para Braille. Aguarde.');
+    speakText('Convertendo o documento para Braille. Aguarde.');
     triggerVibration([40, 40, 40]);
 
     try {
@@ -423,7 +307,7 @@ async function converterPdfBraille(input) {
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok || !data.success) {
-            throw new Error(data.error || 'Falha na conversão do PDF');
+            throw new Error(data.error || 'Falha na conversão do documento');
         }
 
         brailleJob = data;
@@ -432,7 +316,7 @@ async function converterPdfBraille(input) {
         speakText('Arquivo convertido com sucesso. O botão imprimir está disponível.');
         triggerVibration([60, 30, 60]);
     } catch (error) {
-        console.error('Erro na conversão PDF:', error);
+        console.error('Erro na conversão do documento:', error);
         setPdfStatus(`Erro ao converter: ${error.message}`);
         speakText(`Erro ao converter o arquivo: ${error.message}`);
     } finally {
@@ -445,7 +329,7 @@ function mostrarResultadoPdf(data) {
     document.getElementById('pdfBraillePreview').innerText = data.braille_preview || '';
 
     document.getElementById('pdfStats').innerText = [
-        `${data.paginas} página(s)`,
+        data.paginas ? `${data.paginas} página(s)` : '',
         `${data.caracteres} caracteres`,
         `${data.celulas} células Braille`,
         `${data.linhas} linha(s) de ${data.largura} células`,

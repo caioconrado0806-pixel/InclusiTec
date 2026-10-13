@@ -1,8 +1,9 @@
 """
-Rotas de conversão PDF -> Braille e de impressão.
+Rotas de conversão Documento -> Braille e de impressão.
 
 POST /api/braille/pdf
-    Envia um PDF (multipart 'pdf') e recebe de volta o documento
+    Envia um documento (multipart 'pdf': PDF, Word .docx, .odt, .rtf,
+    .pptx, .xlsx, HTML ou texto) e recebe de volta o documento
     convertido em Braille, mais os arquivos gerados (.brf/.brl/.txt).
 
 GET /api/braille/jobs/<job_id>/download/<fmt>
@@ -26,6 +27,7 @@ from flask import Blueprint, jsonify, request, send_from_directory
 
 import config
 from backend.braille import PortugueseToBraille
+from backend.services import documento_service
 
 bp = Blueprint('braille_pdf', __name__)
 
@@ -33,7 +35,7 @@ bp = Blueprint('braille_pdf', __name__)
 FORMATOS = {
     'brf': ('.brf', 'ASCII Braille (arquivo para impressora Braille)'),
     'brl': ('.brl', 'Braille Unicode (⠿)'),
-    'txt': ('.txt', 'Texto original extraído do PDF'),
+    'txt': ('.txt', 'Texto original extraído do documento'),
 }
 
 try:
@@ -78,6 +80,18 @@ def _ler_pdf(conteudo):
         texto = texto[:config.MAX_PDF_TEXT_CHARS] + '\n\n[texto truncado]'
 
     return texto, len(reader.pages)
+
+
+def _ler_documento(nome, conteudo):
+    """
+    Extrai o texto de qualquer documento aceito.
+
+    Returns:
+        (texto, páginas) — páginas é None nos formatos sem paginação.
+    """
+    if conteudo.startswith(b'%PDF') or nome.lower().endswith('.pdf'):
+        return _ler_pdf(conteudo)
+    return documento_service.extrair_texto(nome, conteudo)
 
 
 # ==================================================================
@@ -173,7 +187,7 @@ def _imprimir_raw(nome_impressora, dados, titulo):
 
 @bp.route('/api/braille/pdf', methods=['POST'])
 def converter_pdf():
-    """Converte um PDF em arquivo para impressora Braille."""
+    """Converte um documento em arquivo para impressora Braille."""
     try:
         if 'pdf' in request.files:
             arquivo = request.files['pdf']
@@ -190,31 +204,25 @@ def converter_pdf():
         else:
             return jsonify({
                 'success': False,
-                'error': 'Nenhum PDF enviado. Use o campo "pdf" (multipart).'
+                'error': 'Nenhum documento enviado. Use o campo "pdf" (multipart).'
             }), 400
 
         if not conteudo:
             return jsonify({'success': False, 'error': 'O arquivo está vazio.'}), 400
 
-        if not nome_original.lower().endswith('.pdf') and not conteudo.startswith(b'%PDF'):
-            return jsonify({
-                'success': False,
-                'error': 'O arquivo enviado não é um PDF válido.'
-            }), 400
-
         if len(conteudo) > config.MAX_PDF_BYTES:
             return jsonify({
                 'success': False,
-                'error': f'PDF muito grande (máx. {config.MAX_PDF_BYTES // (1024 * 1024)} MB).'
+                'error': f'Arquivo muito grande (máx. {config.MAX_PDF_BYTES // (1024 * 1024)} MB).'
             }), 413
 
-        texto, paginas = _ler_pdf(conteudo)
+        texto, paginas = _ler_documento(nome_original, conteudo)
 
         if not texto.strip():
             return jsonify({
                 'success': False,
-                'error': 'Não foi possível extrair texto do PDF. '
-                         'Parece ser um PDF de imagens/escaneado — use OCR antes de converter.'
+                'error': 'Não foi possível extrair texto do documento. '
+                         'Se for um arquivo de imagens/escaneado, use OCR antes de converter.'
             }), 422
 
         conversor = PortugueseToBraille(wrap_width=config.BRAILLE_LINE_WIDTH)
@@ -271,8 +279,9 @@ def converter_pdf():
             'truncated': len(braille_unicode) > limite_preview,
             'arquivos': arquivos,
             'message': (
-                f'"{nome_original}" convertido: {paginas} página(s), '
-                f'{len(celulas)} células Braille.'
+                f'"{nome_original}" convertido: '
+                + (f'{paginas} página(s), ' if paginas else '')
+                + f'{len(celulas)} células Braille.'
             ),
         })
 
@@ -281,7 +290,7 @@ def converter_pdf():
     except Exception as erro:  # noqa: BLE001 - retorna erro amigável
         return jsonify({
             'success': False,
-            'error': f'Erro ao converter o PDF: {erro}'
+            'error': f'Erro ao converter o documento: {erro}'
         }), 500
 
 
@@ -294,7 +303,7 @@ def baixar_job(job_id, fmt):
 
     job = _carregar_job(job_id)
     if job is None:
-        return jsonify({'success': False, 'error': 'Trabalho não encontrado. Converta o PDF novamente.'}), 404
+        return jsonify({'success': False, 'error': 'Trabalho não encontrado. Converta o documento novamente.'}), 404
 
     extensao = FORMATOS[fmt][0]
     nome = job['arquivos'].get(fmt, {}).get('nome') or f"{job.get('base', 'documento')}{extensao}"
@@ -343,7 +352,7 @@ def imprimir():
     if job is None:
         return jsonify({
             'success': False,
-            'error': 'Arquivo convertido não encontrado. Converta o PDF novamente.',
+            'error': 'Arquivo convertido não encontrado. Converta o documento novamente.',
         }), 404
 
     extensao = FORMATOS[formato][0]

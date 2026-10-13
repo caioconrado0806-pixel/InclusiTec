@@ -35,7 +35,8 @@ português brasileiro. **Backend e frontend 100% em Python.**
   detecção instantânea
 - **Upload de imagens**: permite selecionar arquivos de imagem
   para análise
-- **Conversor de documentos**: converte **PDF** em texto
+- **Conversor de documentos**: converte **PDF**, Word (.docx),
+  .odt, .rtf, .pptx, .xlsx, HTML e arquivos de texto em
   Braille pronto para impressão (.brf/.brl/.txt)
 - **Impressão em Braille**: envia o documento à impressora
   conectada (Wi-Fi, Bluetooth ou cabo) ou salva como PDF
@@ -87,8 +88,9 @@ Interface gráfica com câmera, leitura de arquivo e voz.
 
 ### 4. Usar a detecção
 
-1. **Por câmera**: "Capturar Foto Agora" ou "Tirar Foto
-   (Comando de Voz)" → diga "tirar foto"
+1. **Por câmera**: "Tirar Foto (Comando de Voz)" → diga
+   "tirar foto"; a câmera abre, enquadra a folha em tempo
+   real e fotografa sozinha quando estiver alinhada
 2. **Por arquivo**: "Selecionar Arquivo de Mídia"
 3. O sistema detecta os padrões de Braille, exibe o texto
    traduzido e a imagem com os pontos destacados
@@ -139,7 +141,8 @@ Verifica o servidor e mostra o detector ativo.
 
 ### `POST /api/braille/pdf`
 
-PDF via multipart (`pdf`). Extrai o texto e devolve
+Documento via multipart (`pdf`): PDF, .docx, .odt, .rtf, .pptx,
+.xlsx, HTML ou texto. Extrai o texto e devolve
 a conversão em Braille, pronta para impressão:
 
 ```json
